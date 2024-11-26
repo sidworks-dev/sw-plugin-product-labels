@@ -1,4 +1,4 @@
-# Sidworks Product Pabels for Shopware 6
+# Sidworks Product Labels for Shopware 6
 This plugin adds product labels to the storefront
 
 ## Installation
