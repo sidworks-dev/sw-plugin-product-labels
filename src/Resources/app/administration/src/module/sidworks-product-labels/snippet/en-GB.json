@@ -1,0 +1,11 @@
+{
+  "sidworks-product-labels": {
+    "general": {
+      "pluginTitle": "Product Labels",
+      "pluginDescription": "Manage product labels"
+    },
+    "list": {
+      "addButtonText": "Add label"
+    }
+  }
+}

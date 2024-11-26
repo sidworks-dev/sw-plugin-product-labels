@@ -1,0 +1,26 @@
+{% block sidworks_product_labels_list %}
+    <sw-page>
+        {% block sidworks_product_labels_list_language_switch %}
+            <template #language-switch>
+                <sw-language-switch @on-change="onChangeLanguage"/>
+            </template>
+        {% endblock %}
+
+        {% block sidworks_product_labels_list_smart_bar_actions %}
+            <template #smart-bar-actions>
+                <sw-button class="sw-order-list__add-order"
+                           variant="primary"
+                           :router-link="{ name: 'sidworks.product.labels.list' }"
+                >
+                    {{ $tc('sidworks-product-labels.list.addButtonText') }}
+                </sw-button>
+            </template>
+        {% endblock %}
+
+        {% block sidworks_product_labels_list_content %}
+            <template #content>
+                CONTENT
+            </template>
+        {% endblock %}
+    </sw-page>
+{% endblock %}
