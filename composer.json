@@ -1,0 +1,29 @@
+{
+    "name": "sidworks/sw-plugin-product-labels",
+    "description": "Sidworks product labels",
+    "type": "shopware-platform-plugin",
+    "version": "1.0.0",
+    "require": {
+        "shopware/core": "^6.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sidworks"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sidworks\\ProductLabels\\": "src/"
+        }
+    },
+    "extra": {
+        "shopware-plugin-class": "Sidworks\\ProductLabels\\SidworksProductLabels",
+        "label": {
+            "en-GB": "Sidworks Product Labels"
+        },
+        "description": {
+            "en-GB": "Sidworks Product Labels"
+        }
+    }
+}
