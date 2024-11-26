@@ -1,5 +1,4 @@
-//import './page/sidworks-product-labels-create';
-//import './page/sidworks-product-labels-detail';
+import './page/sidworks-product-labels-detail';
 import './page/sidworks-product-labels-list';
 import enGB from './snippet/en-GB.json';
 
@@ -16,30 +15,37 @@ Module.register('sidworks-product-labels', {
     },
 
     routes: {
-        list: {
-            component: 'sidworks-product-labels-list',
-            path: 'list'
+        index: {
+            components: {
+                default: 'sidworks-product-labels-list',
+            },
+            path: 'index'
         },
-        /*detail: {
+        create: {
+            component: 'sidworks-product-labels-detail',
+            path: 'create',
+            meta: {
+                parentPath: 'sidworks.product.labels.index'
+            },
+        },
+        detail: {
             component: 'sidworks-product-labels-detail',
             path: 'detail/:id',
             meta: {
-                parentPath: 'sidworks.product.labels.list'
-            }
+                parentPath: 'sidworks.product.labels.index',
+            },
+            props: {
+                default(route) {
+                    return { labelId: route.params.id };
+                },
+            },
         },
-        create: {
-            component: 'sidworks-product-labels-create',
-            path: 'create',
-            meta: {
-                parentPath: 'sidworks.product.labels.list'
-            }
-        }*/
     },
 
     navigation: [
         {
             id: 'sidworks-product-labels-module',
-            path: 'sidworks.product.labels.list',
+            path: 'sidworks.product.labels.index',
             parent: 'sw-catalogue',
             label: 'sidworks-product-labels.general.pluginTitle',
             position: 10

@@ -8,10 +8,7 @@
 
         {% block sidworks_product_labels_list_smart_bar_actions %}
             <template #smart-bar-actions>
-                <sw-button class="sw-order-list__add-order"
-                           variant="primary"
-                           :router-link="{ name: 'sidworks.product.labels.list' }"
-                >
+                <sw-button variant="primary" :router-link="{ name: 'sidworks.product.labels.create' }">
                     {{ $tc('sidworks-product-labels.list.addButtonText') }}
                 </sw-button>
             </template>
@@ -19,7 +16,14 @@
 
         {% block sidworks_product_labels_list_content %}
             <template #content>
-                CONTENT
+                <sw-entity-listing
+                        v-if="repositoryItems && repositoryItems.length > 0"
+                        :items="repositoryItems"
+                        :repository="repository"
+                        :showSelection="false"
+                        :columns="columns"
+                        detailRoute="sidworks.product.labels.detail"
+                />
             </template>
         {% endblock %}
     </sw-page>

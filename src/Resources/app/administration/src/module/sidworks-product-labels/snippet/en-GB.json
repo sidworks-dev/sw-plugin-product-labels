@@ -5,6 +5,8 @@
       "pluginDescription": "Manage product labels"
     },
     "list": {
+      "name": "Name",
+      "active": "Active",
       "addButtonText": "Add label"
     }
   }
