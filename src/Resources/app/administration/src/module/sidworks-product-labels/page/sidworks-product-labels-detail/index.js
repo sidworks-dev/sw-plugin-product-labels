@@ -7,9 +7,14 @@ Component.register('sidworks-product-labels-detail', {
     inject: [
         'repositoryFactory'
     ],
+    mixins: [
+        Mixin.getByName('notification')
+    ],
 
     data() {
         return {
+            isLoading: false,
+            processSuccess: false,
             item: null,
             repository: null
         };
@@ -17,17 +22,40 @@ Component.register('sidworks-product-labels-detail', {
 
     methods: {
         onSave() {
-            this.repository.save(this.item, Shopware.Context.api);
-        },
-        getItem() {
-            this.repository.get(this.$route.params.id, Shopware.Context.api).then((entity) => {
-                this.item = entity;
+            this.isLoading = true;
+
+            this.repository.save(this.item, Shopware.Context.api).then(() => {
+                this.getItem();
+                this.isLoading = false;
+                this.processSuccess = true;
+            }).catch((exception) => {
+                this.isLoading = false;
+                this.createNotificationError({
+                    title: this.$tc('global.default.error'),
+                    message: exception.toString(),
+                    autoClose: true,
+                });
             });
+        },
+
+        saveFinish() {
+            this.processSuccess = false;
+        },
+
+        getItem() {
+            let id = this.$route.params.id;
+            if (id) {
+                this.repository.get(id, Shopware.Context.api).then((entity) => {
+                    this.item = entity;
+                });
+            } else {
+                this.item = this.repository.create(Shopware.Context.api);
+            }
         }
     },
 
     created() {
         this.repository = this.repositoryFactory.create('sidworks_product_labels');
         this.getItem();
-    },
+    }
 });

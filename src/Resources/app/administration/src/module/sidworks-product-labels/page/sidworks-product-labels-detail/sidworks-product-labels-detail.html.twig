@@ -10,8 +10,12 @@
             </sw-button>
 
             <sw-button-process
-                    variant="primary"
-                    @click="onSave">
+                :isLoading="isLoading"
+                :processSuccess="processSuccess"
+                variant="primary"
+                @click.prevent="onSave"
+                @update:process-success="saveFinish"
+            >
                 Save
             </sw-button-process>
         </template>
@@ -20,28 +24,47 @@
             <template #content>
                 <sw-card-view>
                     <sw-card
-                            position-identifier="sw-settings-snippet-detail-snippets"
-                            title="Product label settings"
+                        :isLoading="isLoading"
+                        position-identifier="sw-settings-snippet-detail-snippets"
+                        title="Product label settings"
                     >
                         <sw-switch-field
-                                required
-                                label="Enabled"
-                                v-model:value="item.active"
+                            label="Enabled"
+                            v-model:value="item.active"
+                            required
                         />
 
                         <sw-text-field
-                                label="Label name"
-                                v-model:value="item.name"
-                                required
+                            label="Label name"
+                            v-model:value="item.name"
+                            required
+                        />
+
+                        <sw-text-field
+                            label="Label content"
+                            v-model:value="item.content"
+                            required
+                        />
+
+                        <sw-colorpicker
+                            label="Background color"
+                            v-model:value="item.backgroundColor"
+                            required
+                        />
+
+                        <sw-colorpicker
+                            label="Text color"
+                            v-model:value="item.textColor"
+                            required
                         />
 
                         <sw-entity-single-select
-                                label="Dynamic Product Group"
-                                entity="product_stream"
-                                v-model:value="item.productStreamId"
-                                @update:value="onChange"
-                                required
-                                show-clearable-button
+                            label="Dynamic Product Group"
+                            entity="product_stream"
+                            v-model:value="item.productStreamId"
+                            @update:value="onChange"
+                            required
+                            show-clearable-button
                         />
                     </sw-card>
                 </sw-card-view>
