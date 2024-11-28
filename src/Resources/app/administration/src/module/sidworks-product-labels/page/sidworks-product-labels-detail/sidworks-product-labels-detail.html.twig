@@ -1,12 +1,44 @@
 {% block sidworks_product_labels_detail %}
     <sw-page>
+        <template #language-switch>
+            <sw-language-switch @on-change="onChangeLanguage"/>
+        </template>
+
+        <template #smart-bar-actions>
+            <sw-button :routerLink="{ name: 'sidworks.product.labels.index' }">
+                Cancel
+            </sw-button>
+
+            <sw-button-process
+                    variant="primary"
+                    @click="onSave">
+                Save
+            </sw-button-process>
+        </template>
+
         {% block sidworks_product_labels_detail_content %}
             <template #content>
-                {#<sw-condition-tree
-                        v-model="entity.conditions"
-                        :conditionDataProviderService="conditionDataProviderService"
-                        :conditionContext="conditionContext">
-                </sw-condition-tree>#}
+                <sw-card-view>
+                    <sw-card
+                            position-identifier="sw-settings-snippet-detail-snippets"
+                            title="Product label settings"
+                    >
+                        <sw-text-field
+                                label="Label name"
+                                v-model:value="item.name"
+                                required
+                        />
+
+                        <sw-entity-single-select
+                                label="Dynamic Product Group"
+                                entity="product_stream"
+                                v-model:value="item.productStreamId"
+                                @update:value="onChange"
+                                required
+                                show-clearable-button
+                        />
+                    </sw-card>
+                </sw-card-view>
             </template>
         {% endblock %}
     </sw-page>

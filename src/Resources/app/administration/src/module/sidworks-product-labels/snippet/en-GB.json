@@ -8,6 +8,9 @@
       "name": "Name",
       "active": "Active",
       "addButtonText": "Add label"
+    },
+    "detail": {
+      "name": "Name"
     }
   }
 }

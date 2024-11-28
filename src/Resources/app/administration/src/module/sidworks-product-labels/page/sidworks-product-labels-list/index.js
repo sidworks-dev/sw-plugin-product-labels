@@ -43,7 +43,7 @@ Component.register('sidworks-product-labels-list', {
     },
 
     created() {
-        this.repository = this.repositoryFactory.create('customer');
+        this.repository = this.repositoryFactory.create('sidworks_product_labels');
 
         this.repository
             .search(new Criteria(), Shopware.Context.api)
