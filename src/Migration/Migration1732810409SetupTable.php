@@ -25,7 +25,7 @@ class Migration1732810409SetupTable extends MigrationStep
             `label_content` VARCHAR(255),
             `label_background_color` VARCHAR(255),
             `label_text_color` VARCHAR(255),
-            `product_stream_id` VARCHAR(16),
+            `product_stream_id` BINARY(16) NOT NULL,
             `created_at` DATETIME(3) NOT NULL,
             `updated_at` DATETIME(3) NULL,
              PRIMARY KEY (`id`),

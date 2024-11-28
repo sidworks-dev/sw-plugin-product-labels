@@ -23,6 +23,12 @@
                             position-identifier="sw-settings-snippet-detail-snippets"
                             title="Product label settings"
                     >
+                        <sw-switch-field
+                                required
+                                label="Enabled"
+                                v-model:value="item.active"
+                        />
+
                         <sw-text-field
                                 label="Label name"
                                 v-model:value="item.name"

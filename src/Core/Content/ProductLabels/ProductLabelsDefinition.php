@@ -40,9 +40,7 @@ class ProductLabelsDefinition extends EntityDefinition
                 new StringField('label_content', 'content'),
                 new StringField('label_background_color', 'backgroundColor'),
                 new StringField('label_text_color', 'textColor'),
-                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class)),
-                new DateTimeField('created_at', 'createdAt'),
-                new DateTimeField('updated_at', 'updatedAt'),
+                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required())
             ]
         );
     }
