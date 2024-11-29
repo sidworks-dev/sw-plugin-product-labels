@@ -36,10 +36,10 @@ class ProductLabelsDefinition extends EntityDefinition
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 new BoolField('active', 'active'),
-                new StringField('label_name', 'name'),
-                new StringField('label_content', 'content'),
-                new StringField('label_background_color', 'backgroundColor'),
-                new StringField('label_text_color', 'textColor'),
+                new StringField('name', 'name'),
+                new StringField('content', 'content'),
+                new StringField('background_color', 'backgroundColor'),
+                new StringField('text_color', 'textColor'),
                 (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required())
             ]
         );
