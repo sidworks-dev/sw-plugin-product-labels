@@ -45,9 +45,12 @@ Component.register('sidworks-product-labels-detail', {
         getEntity() {
             let id = this.$route.params.id;
             if (id) {
-                this.repository.get(id, Shopware.Context.api).then((entity) => {
-                    this.entity = entity;
-                });
+                this.repository
+                    .get(this.$route.params.id, Shopware.Context.api)
+                    .then((entity) => {
+                        this.entity = entity;
+                        this.entityId = entity.id;
+                    });
             } else {
                 this.entity = this.repository.create(Shopware.Context.api);
             }
