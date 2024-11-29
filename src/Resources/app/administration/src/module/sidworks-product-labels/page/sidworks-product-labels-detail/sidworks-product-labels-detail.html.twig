@@ -24,44 +24,45 @@
             <template #content>
                 <sw-card-view>
                     <sw-card
-                        :isLoading="isLoading"
+                        v-if="entity"
+                        :is-loading="isLoading"
                         position-identifier="sw-settings-snippet-detail-snippets"
                         title="Product label settings"
                     >
                         <sw-switch-field
                             label="Enabled"
-                            v-model:value="item.active"
+                            v-model:value="entity.active"
                             required
                         />
 
                         <sw-text-field
                             label="Label name"
-                            v-model:value="item.name"
+                            v-model:value="entity.name"
                             required
                         />
 
                         <sw-text-field
                             label="Label content"
-                            v-model:value="item.content"
+                            v-model:value="entity.content"
                             required
                         />
 
                         <sw-colorpicker
                             label="Background color"
-                            v-model:value="item.backgroundColor"
+                            v-model:value="entity.backgroundColor"
                             required
                         />
 
                         <sw-colorpicker
                             label="Text color"
-                            v-model:value="item.textColor"
+                            v-model:value="entity.textColor"
                             required
                         />
 
                         <sw-entity-single-select
                             label="Dynamic Product Group"
                             entity="product_stream"
-                            v-model:value="item.productStreamId"
+                            v-model:value="entity.productStreamId"
                             @update:value="onChange"
                             required
                             show-clearable-button
