@@ -6,15 +6,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 class ProductLabelsEntity extends Entity
 {
-    protected $name;
-
-    public function getName(): ?string
+    public function getProductStreamId(): ?string
     {
-        return $this->name;
+        return $this->productStreamId;
     }
 
-    public function setName(string $name): void
+    public function getId(): ?string
     {
-        $this->name = $name;
+        return $this->id;
     }
 }
