@@ -34,7 +34,7 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
         $productEntities = $event->getResult()->getEntities();
         $productIds = $productEntities->getIds();
 
-        $productLabelsStreamProducts = $this->getProductLabelStreamProducts($context, $productIds);
+        $productLabelsStreamProducts = $this->getProductLabelStreamProducts($context);
 
         if (empty($productLabelsStreamProducts)) {
             return;
@@ -65,7 +65,7 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
      * @param array|null $productIds
      * @return array
      */
-    private function getProductLabelStreamProducts($context, ?array $productIds = null): array
+    private function getProductLabelStreamProducts($context): array
     {
         $productLabelsCriteria = new Criteria();
         $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
@@ -81,7 +81,7 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
                 $context
             );
 
-            $productStreamCriteria = $productIds ? new Criteria($productIds) : new Criteria();
+            $productStreamCriteria = new Criteria();
             $productStreamCriteria->addFilter(...$productStreamFilters);
 
             $streamProducts = $this->productRepository->search($productStreamCriteria, $context);
