@@ -62,7 +62,6 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
      * Retrieve product label stream products.
      *
      * @param Context $context
-     * @param array|null $productIds
      * @return array
      */
     private function getProductLabelStreamProducts($context): array
