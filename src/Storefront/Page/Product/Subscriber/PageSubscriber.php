@@ -47,7 +47,13 @@ class PageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($event->getResult()->getEntities() as $productEntity) {
+        $productEntities = $event->getResult()->getEntities();
+
+        if ($productEntities->count() === 0) {
+            return;
+        }
+
+        foreach ($productEntities as $productEntity) {
             $this->labelStreamService->applyLabelsToProduct($productEntity, $productLabelsStreamProducts);
         }
     }
