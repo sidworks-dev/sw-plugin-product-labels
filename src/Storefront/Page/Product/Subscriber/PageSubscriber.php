@@ -8,7 +8,7 @@ use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
 use Sidworks\ProductLabels\Service\LabelStreamService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ProductPageCriteriaSubscriber implements EventSubscriberInterface
+class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
       private LabelStreamService $labelStreamService
