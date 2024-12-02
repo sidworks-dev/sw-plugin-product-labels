@@ -31,14 +31,14 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
     public function onProductListingResult(ProductListingResultEvent $event): void
     {
         $context = $event->getContext();
-        $productEntities = $event->getResult()->getEntities();
-        $productIds = $productEntities->getIds();
 
         $productLabelsStreamProducts = $this->getProductLabelStreamProducts($context);
 
         if (empty($productLabelsStreamProducts)) {
             return;
         }
+
+        $productEntities = $event->getResult()->getEntities();
 
         foreach ($productLabelsStreamProducts as $productLabelsStreamProduct) {
             $streamProducts = $productLabelsStreamProduct['stream']->getIds();
