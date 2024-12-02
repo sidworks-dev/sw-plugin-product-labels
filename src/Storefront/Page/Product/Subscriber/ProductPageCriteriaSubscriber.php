@@ -28,6 +28,10 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param ProductListingResultEvent $event
+     * @return void
+     */
     public function onProductListingResult(ProductListingResultEvent $event): void
     {
         $context = $event->getContext();
@@ -64,7 +68,7 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
      * @param Context $context
      * @return array
      */
-    private function getProductLabelStreamProducts($context): array
+    private function getProductLabelStreamProducts(Context $context): array
     {
         $productLabelsCriteria = new Criteria();
         $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
