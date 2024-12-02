@@ -10,7 +10,12 @@
             {% block component_sidworks_product_badges_elements %}
                 {% for sidworksProductLabel in sidworksProductLabels.all %}
                     <div>
-                        <span class="badge badge-sidworks-product-labels bg-primary">{{ sidworksProductLabel.content|escape|sw_sanitize }}</span>
+                        <span
+                            class="badge badge-sidworks-product-labels bg-primary"
+                            style="background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }}; color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }}"
+                        >
+                            {{ sidworksProductLabel.content|escape|sw_sanitize }}
+                        </span>
                     </div>
                 {% endfor %}
             {% endblock %}
