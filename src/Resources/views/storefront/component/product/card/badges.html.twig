@@ -1,0 +1,17 @@
+{% sw_extends '@Storefront/storefront/component/product/card/badges.html.twig' %}
+
+{% block component_product_badges_new %}
+    {{ parent() }}
+
+    {% block component_sidworks_product_badges %}
+        {% set sidworksProductLabels = product.extensions.sidworksProductLabels ?? null %}
+
+        {% if sidworksProductLabels and sidworksProductLabels.all|length > 0 %}
+            {% block component_sidworks_product_badges_elements %}
+                {% for sidworksProductLabel in sidworksProductLabels.all %}
+                    <span class="badge bg-primary">{{ sidworksProductLabel.content|trans|sw_sanitize }}</span>
+                {% endfor %}
+            {% endblock %}
+        {% endif %}
+    {% endblock %}
+{% endblock %}
