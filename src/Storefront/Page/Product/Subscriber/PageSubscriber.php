@@ -2,6 +2,7 @@
 
 namespace Sidworks\ProductLabels\Storefront\Page\Product\Subscriber;
 
+use Shopware\Core\Content\Product\Events\ProductCrossSellingsLoadedEvent;
 use Shopware\Core\Content\Product\Events\ProductListingResultEvent;
 use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
@@ -17,37 +18,53 @@ class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ProductPageLoadedEvent::class => 'onProductPageLoadedResult',
-            ProductListingResultEvent::class => 'onProductListingResult',
-            ProductSearchResultEvent::class => 'onProductListingResult'
+            ProductPageLoadedEvent::class => 'onProductPageLoaded',
+            ProductListingResultEvent::class => 'onProductListingEvent',
+            ProductCrossSellingsLoadedEvent::class => 'onProductCrossSellingsLoaded',
+            ProductSearchResultEvent::class => 'onProductListingEvent',
         ];
     }
 
-    public function onProductPageLoadedResult(ProductPageLoadedEvent $event): void
+    public function onProductPageLoaded(ProductPageLoadedEvent $event): void
     {
-        $context = $event->getContext();
-        $productLabelsStreamProducts = $this->labelStreamService->getProductLabelStreamProducts($context);
-
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
 
         $product = $event->getPage()->getProduct();
-
         $this->labelStreamService->applyLabelsToProduct($product, $productLabelsStreamProducts);
     }
 
-    public function onProductListingResult(ProductListingResultEvent $event): void
+    public function onProductListingEvent(ProductListingResultEvent $event): void
     {
-        $context = $event->getContext();
-        $productLabelsStreamProducts = $this->labelStreamService->getProductLabelStreamProducts($context);
-
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
 
-        $productEntities = $event->getResult()->getEntities();
+        $this->applyLabelsToProducts($event->getResult()->getEntities(), $productLabelsStreamProducts);
+    }
 
+    public function onProductCrossSellingsLoaded(ProductCrossSellingsLoadedEvent $event): void
+    {
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
+        if (empty($productLabelsStreamProducts)) {
+            return;
+        }
+
+        foreach ($event->getCrossSellings() as $crossSellEntity) {
+            $this->applyLabelsToProducts($crossSellEntity->getProducts(), $productLabelsStreamProducts);
+        }
+    }
+
+    private function fetchLabelStreamProducts($context): array
+    {
+        return $this->labelStreamService->getProductLabelStreamProducts($context);
+    }
+
+    private function applyLabelsToProducts($productEntities, array $productLabelsStreamProducts): void
+    {
         if ($productEntities->count() === 0) {
             return;
         }
