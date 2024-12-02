@@ -3,14 +3,18 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="Sidworks\ProductLabels\Service\LabelStreamService">
+            <argument type="service" id="sidworks_product_labels.repository"/>
+            <argument type="service" id="Shopware\Core\Content\ProductStream\Service\ProductStreamBuilder"/>
+            <argument type="service" id="product.repository" />
+        </service>
+
         <service id="Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsDefinition">
             <tag name="shopware.entity.definition" entity="sidworks_product_labels"/>
         </service>
 
         <service id="Sidworks\ProductLabels\Storefront\Page\Product\Subscriber\ProductPageCriteriaSubscriber">
-            <argument type="service" id="sidworks_product_labels.repository"/>
-            <argument type="service" id="Shopware\Core\Content\ProductStream\Service\ProductStreamBuilder"/>
-            <argument type="service" id="product.repository" />
+            <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

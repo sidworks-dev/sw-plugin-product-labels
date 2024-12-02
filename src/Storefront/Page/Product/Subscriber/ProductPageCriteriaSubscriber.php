@@ -2,23 +2,18 @@
 
 namespace Sidworks\ProductLabels\Storefront\Page\Product\Subscriber;
 
-use Shopware\Core\Content\ProductStream\Service\ProductStreamBuilderInterface;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\Content\Product\Events\ProductListingResultEvent;
 use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
+use Sidworks\ProductLabels\Service\LabelStreamService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProductPageCriteriaSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EntityRepository $productLabelsRepository,
-        private readonly ProductStreamBuilderInterface $productStreamBuilder,
-        private readonly EntityRepository $productRepository
-    ) {}
+      private LabelStreamService $labelStreamService
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -28,15 +23,10 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ProductListingResultEvent $event
-     * @return void
-     */
     public function onProductListingResult(ProductListingResultEvent $event): void
     {
         $context = $event->getContext();
-
-        $productLabelsStreamProducts = $this->getProductLabelStreamProducts($context);
+        $productLabelsStreamProducts = $this->labelStreamService->getProductLabelStreamProducts($context);
 
         if (empty($productLabelsStreamProducts)) {
             return;
@@ -60,41 +50,5 @@ class ProductPageCriteriaSubscriber implements EventSubscriberInterface
                 $productEntity->addExtension('sidworksProductLabels', $sidworksProductLabels);
             }
         }
-    }
-
-    /**
-     * Retrieve product label stream products.
-     *
-     * @param Context $context
-     * @return array
-     */
-    private function getProductLabelStreamProducts(Context $context): array
-    {
-        $productLabelsCriteria = new Criteria();
-        $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
-
-        $productLabels = $this->productLabelsRepository
-            ->search($productLabelsCriteria, $context)
-            ->getEntities();
-
-        $productLabelStreamItems = [];
-        foreach ($productLabels as $productLabel) {
-            $productStreamFilters = $this->productStreamBuilder->buildFilters(
-                $productLabel->getProductStreamId(),
-                $context
-            );
-
-            $productStreamCriteria = new Criteria();
-            $productStreamCriteria->addFilter(...$productStreamFilters);
-
-            $streamProducts = $this->productRepository->search($productStreamCriteria, $context);
-
-            $productLabelStreamItems[] = [
-                'stream' => $streamProducts,
-                'label' => $productLabel,
-            ];
-        }
-
-        return $productLabelStreamItems;
     }
 }
