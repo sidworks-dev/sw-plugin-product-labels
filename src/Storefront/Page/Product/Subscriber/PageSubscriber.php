@@ -2,7 +2,6 @@
 
 namespace Sidworks\ProductLabels\Storefront\Page\Product\Subscriber;
 
-use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\Content\Product\Events\ProductListingResultEvent;
 use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
