@@ -9,7 +9,9 @@
         {% if sidworksProductLabels and sidworksProductLabels.all|length > 0 %}
             {% block component_sidworks_product_badges_elements %}
                 {% for sidworksProductLabel in sidworksProductLabels.all %}
-                    <span class="badge bg-primary">{{ sidworksProductLabel.content|trans|sw_sanitize }}</span>
+                    <div>
+                        <span class="badge badge-sidworks-product-labels bg-primary">{{ sidworksProductLabel.content|escape|sw_sanitize }}</span>
+                    </div>
                 {% endfor %}
             {% endblock %}
         {% endif %}
