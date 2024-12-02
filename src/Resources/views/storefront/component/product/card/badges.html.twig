@@ -11,8 +11,8 @@
                 {% for sidworksProductLabel in sidworksProductLabels.all %}
                     <div>
                         <span
-                            class="badge badge-sidworks-product-labels bg-primary"
-                            style="background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }}; color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }}"
+                            class="badge badge-sidworks-product-labels-label"
+                            style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
                         >
                             {{ sidworksProductLabel.content|escape|sw_sanitize }}
                         </span>
