@@ -1,9 +1,8 @@
 import template from './sidworks-product-labels-list.html.twig';
 
-const { Component } = Shopware;
 const { Criteria } = Shopware.Data;
 
-Component.register('sidworks-product-labels-list', {
+export default {
     template,
 
     inject: [
@@ -51,4 +50,4 @@ Component.register('sidworks-product-labels-list', {
                 this.repositoryItems = result;
             });
     }
-})
+};

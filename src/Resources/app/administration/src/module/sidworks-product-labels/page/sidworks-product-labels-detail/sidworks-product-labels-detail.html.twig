@@ -5,69 +5,81 @@
         </template>
 
         <template #smart-bar-actions>
-            <sw-button :routerLink="{ name: 'sidworks.product.labels.index' }">
-                Cancel
+            <sw-button
+                    v-tooltip.bottom="tooltipCancel"
+                    :disabled="isLoading"
+                    @click="onCancel"
+            >
+                {{ $tc('global.default.cancel') }}
             </sw-button>
 
             <sw-button-process
-                :isLoading="isLoading"
-                :processSuccess="processSuccess"
-                variant="primary"
-                @click.prevent="onSave"
-                @update:process-success="saveFinish"
+                    v-tooltip.bottom="tooltipSave"
+                    :isLoading="isLoading"
+                    :processSuccess="processSuccess"
+                    variant="primary"
+                    @click.prevent="onSave"
+                    @update:process-success="saveFinish"
             >
-                Save
+                {{ $tc('global.default.save') }}
             </sw-button-process>
         </template>
 
         {% block sidworks_product_labels_detail_content %}
             <template #content>
                 <sw-card-view>
-                    <sw-card
-                        v-if="entity"
-                        :is-loading="isLoading"
-                        position-identifier="sw-settings-snippet-detail-snippets"
-                        title="Product label settings"
-                    >
-                        <sw-switch-field
-                            label="Enabled"
-                            v-model:value="entity.active"
-                            required
-                        />
+                    <template>
+                        <sw-card
+                                v-if="entity"
+                                :is-loading="isLoading"
+                                title="Label general settings"
+                        >
+                            <sw-switch-field
+                                    label="Enabled"
+                                    v-model:value="entity.active"
+                                    required
+                            />
 
-                        <sw-text-field
-                            label="Label name"
-                            v-model:value="entity.name"
-                            required
-                        />
+                            <sw-text-field
+                                    label="Label internal name"
+                                    v-model:value="entity.name"
+                                    required
+                            />
 
-                        <sw-text-field
-                            label="Label content"
-                            v-model:value="entity.content"
-                            required
-                        />
+                            <sw-text-field
+                                    label="Label content"
+                                    v-model:value="entity.content"
+                                    required
+                            />
 
-                        <sw-colorpicker
-                            label="Background color"
-                            v-model:value="entity.backgroundColor"
-                            required
-                        />
+                            <sw-entity-single-select
+                                    label="Dynamic Product Group"
+                                    entity="product_stream"
+                                    v-model:value="entity.productStreamId"
+                                    @update:value="onChange"
+                                    required
+                                    show-clearable-button
+                            />
+                        </sw-card>
 
-                        <sw-colorpicker
-                            label="Text color"
-                            v-model:value="entity.textColor"
-                            required
-                        />
+                        <sw-card
+                                v-if="entity"
+                                :is-loading="isLoading"
+                                title="Label styling"
+                        >
+                            <sw-colorpicker
+                                    label="Background color"
+                                    v-model:value="entity.backgroundColor"
+                                    required
+                            />
 
-                        <sw-entity-single-select
-                            label="Dynamic Product Group"
-                            entity="product_stream"
-                            v-model:value="entity.productStreamId"
-                            @update:value="onChange"
-                            required
-                            show-clearable-button
-                        />
-                    </sw-card>
+                            <sw-colorpicker
+                                    label="Text color"
+                                    v-model:value="entity.textColor"
+                                    required
+                            />
+                        </sw-card>
+                    </template>
                 </sw-card-view>
             </template>
         {% endblock %}

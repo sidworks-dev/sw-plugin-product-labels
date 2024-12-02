@@ -1,7 +1,8 @@
-const {Component, Mixin} = Shopware;
 import template from './sidworks-product-labels-detail.html.twig';
 
-Component.register('sidworks-product-labels-detail', {
+const {Mixin} = Shopware;
+
+export default {
     template,
 
     inject: [
@@ -11,6 +12,11 @@ Component.register('sidworks-product-labels-detail', {
         Mixin.getByName('notification')
     ],
 
+    shortcuts: {
+        'SYSTEMKEY+S': 'onSave',
+        ESCAPE: 'onCancel',
+    },
+
     data() {
         return {
             isLoading: false,
@@ -18,6 +24,28 @@ Component.register('sidworks-product-labels-detail', {
             entity: null,
             repository: null
         };
+    },
+
+    computed: {
+        identifier() {
+            return this.placeholder('HIER', 'name');
+        },
+
+        tooltipSave() {
+            const systemKey = this.$device.getSystemKey();
+
+            return {
+                message: `${systemKey} + S`,
+                appearance: 'light',
+            };
+        },
+
+        tooltipCancel() {
+            return {
+                message: 'ESC',
+                appearance: 'light',
+            };
+        }
     },
 
     methods: {
@@ -36,6 +64,10 @@ Component.register('sidworks-product-labels-detail', {
                     autoClose: true,
                 });
             });
+        },
+
+        onCancel() {
+            this.$router.push({ name: 'sidworks.product.labels.index' });
         },
 
         saveFinish() {
@@ -61,4 +93,4 @@ Component.register('sidworks-product-labels-detail', {
         this.repository = this.repositoryFactory.create('sidworks_product_labels');
         this.getEntity();
     }
-});
+};

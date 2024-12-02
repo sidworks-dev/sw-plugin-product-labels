@@ -1,8 +1,9 @@
-import './page/sidworks-product-labels-detail';
-import './page/sidworks-product-labels-list';
 import enGB from './snippet/en-GB.json';
 
 const { Module } = Shopware;
+
+Shopware.Component.register('sidworks-product-labels-list', () => import('./page/sidworks-product-labels-list'));
+Shopware.Component.register('sidworks-product-labels-detail', () => import('./page/sidworks-product-labels-detail'));
 
 Module.register('sidworks-product-labels', {
     type: 'plugin',
