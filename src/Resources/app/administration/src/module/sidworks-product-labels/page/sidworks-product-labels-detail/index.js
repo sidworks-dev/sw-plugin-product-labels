@@ -11,7 +11,6 @@ export default {
     mixins: [
         Mixin.getByName('notification')
     ],
-
     shortcuts: {
         'SYSTEMKEY+S': 'onSave',
         ESCAPE: 'onCancel',
