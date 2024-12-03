@@ -90,6 +90,8 @@ export default {
 
     created() {
         this.repository = this.repositoryFactory.create('sidworks_product_labels');
+        this.salesChannelRepository = this.repositoryFactory.create('sales_channel');
+
         this.getEntity();
     }
 };

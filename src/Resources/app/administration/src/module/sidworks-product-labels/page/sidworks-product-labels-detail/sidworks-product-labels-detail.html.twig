@@ -34,17 +34,25 @@
                                 :is-loading="isLoading"
                                 title="Label general settings"
                         >
-                            <sw-switch-field
+                            <sw-checkbox-field
                                     label="Enabled"
                                     v-model:value="entity.active"
-                                    required
                             />
 
-                            <sw-text-field
-                                    label="Label internal name"
-                                    v-model:value="entity.name"
-                                    required
-                            />
+                            <sw-container columns="1fr 1fr" gap="16px">
+                                <sw-text-field
+                                        label="Label internal name"
+                                        v-model:value="entity.name"
+                                        required
+                                />
+
+                                <sw-entity-multi-id-select
+                                        label="Sales Channels"
+                                        :repository="salesChannelRepository"
+                                        v-model:value="entity.salesChannelIds"
+                                        required
+                                />
+                            </sw-container>
 
                             <sw-text-field
                                     label="Label content"
@@ -67,17 +75,19 @@
                                 :is-loading="isLoading"
                                 title="Label styling"
                         >
-                            <sw-colorpicker
-                                    label="Background color"
-                                    v-model:value="entity.backgroundColor"
-                                    required
-                            />
+                            <sw-container columns="1fr 1fr" gap="16px">
+                                <sw-colorpicker
+                                        label="Background color"
+                                        v-model:value="entity.backgroundColor"
+                                        required
+                                />
 
-                            <sw-colorpicker
-                                    label="Text color"
-                                    v-model:value="entity.textColor"
-                                    required
-                            />
+                                <sw-colorpicker
+                                        label="Text color"
+                                        v-model:value="entity.textColor"
+                                        required
+                                />
+                            </sw-container>
                         </sw-card>
                     </template>
                 </sw-card-view>

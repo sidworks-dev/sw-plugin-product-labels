@@ -8,8 +8,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
-use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\Content\ProductStream\ProductStreamDefinition;
 
@@ -35,11 +35,12 @@ class ProductLabelsDefinition extends EntityDefinition
         return new FieldCollection(
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                new BoolField('active', 'active'),
-                new StringField('name', 'name'),
-                new StringField('content', 'content'),
-                new StringField('background_color', 'backgroundColor'),
-                new StringField('text_color', 'textColor'),
+                (new BoolField('active', 'active'))->addFlags(new Required()),
+                (new StringField('name', 'name'))->addFlags(new Required()),
+                (new StringField('content', 'content'))->addFlags(new Required()),
+                (new StringField('background_color', 'backgroundColor'))->addFlags(new Required()),
+                (new StringField('text_color', 'textColor'))->addFlags(new Required()),
+                (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
                 (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required())
             ]
         );
