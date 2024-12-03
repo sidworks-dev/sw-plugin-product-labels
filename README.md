@@ -7,3 +7,7 @@ composer require sidworks/sw-plugin-product-labels
 bin/console plugin:refresh
 bin/console plugin:install --activate SidworksProductLabels
 ```
+
+## Todo
+- Determine label position in administration
+- Make translation work
