@@ -12,7 +12,6 @@ bin/console plugin:install --activate SidworksProductLabels
 ### Administration
 - Determine label position in administration
 - Make translation work
-- Make sales channels work
 - Add from/to date (optional setting)
 
 ### Storefront
