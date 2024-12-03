@@ -6,6 +6,7 @@ use Shopware\Core\Content\ProductStream\Service\ProductStreamBuilderInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 
@@ -23,6 +24,7 @@ class LabelStreamService
     {
         $productLabelsCriteria = new Criteria();
         $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
+        $productLabelsCriteria->addFilter(new ContainsFilter('salesChannelIds', $context->getSource()->getSalesChannelId()));
 
         $productLabels = $this->productLabelsRepository
             ->search($productLabelsCriteria, $context)
