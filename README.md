@@ -1,5 +1,5 @@
 # Sidworks Product Labels for Shopware 6
-This plugin adds product labels to the storefront
+This plugin adds custom product labels to the storefront of Shopware 6
 
 ## Installation
 ```bash
@@ -16,3 +16,6 @@ bin/console plugin:install --activate SidworksProductLabels
 
 ### Storefront
 - When label has position, make sure to position them correctly
+- Add option to use {{ product.variable }} in content of label
+- Make it work on product pages
+- Add enable on product page, category
