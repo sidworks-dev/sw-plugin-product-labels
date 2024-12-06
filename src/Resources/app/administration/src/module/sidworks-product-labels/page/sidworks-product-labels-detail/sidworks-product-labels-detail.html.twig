@@ -30,40 +30,40 @@
                 <sw-card-view>
                     <template>
                         <sw-card
-                                v-if="entity"
+                                v-if="label"
                                 :is-loading="isLoading"
                                 title="Label general settings"
                         >
                             <sw-checkbox-field
                                     label="Enabled"
-                                    v-model:value="entity.active"
+                                    v-model:value="label.active"
                             />
 
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-text-field
                                         label="Label internal name"
-                                        v-model:value="entity.name"
+                                        v-model:value="label.name"
                                         required
                                 />
 
                                 <sw-entity-multi-id-select
                                         label="Sales Channels"
                                         :repository="salesChannelRepository"
-                                        v-model:value="entity.salesChannelIds"
+                                        v-model:value="label.salesChannelIds"
                                         required
                                 />
                             </sw-container>
 
                             <sw-text-field
                                     label="Label content"
-                                    v-model:value="entity.content"
+                                    v-model:value="label.content"
                                     required
                             />
 
                             <sw-entity-single-select
                                     label="Dynamic Product Group"
                                     entity="product_stream"
-                                    v-model:value="entity.productStreamId"
+                                    v-model:value="label.productStreamId"
                                     @update:value="onChange"
                                     required
                                     show-clearable-button
@@ -71,20 +71,20 @@
                         </sw-card>
 
                         <sw-card
-                                v-if="entity"
+                                v-if="label"
                                 :is-loading="isLoading"
                                 title="Label styling"
                         >
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-colorpicker
                                         label="Background color"
-                                        v-model:value="entity.backgroundColor"
+                                        v-model:value="label.backgroundColor"
                                         required
                                 />
 
                                 <sw-colorpicker
                                         label="Text color"
-                                        v-model:value="entity.textColor"
+                                        v-model:value="label.textColor"
                                         required
                                 />
                             </sw-container>

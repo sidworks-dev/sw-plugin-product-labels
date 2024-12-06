@@ -11,8 +11,8 @@ export default {
 
     data() {
         return {
-            repository: null,
-            repositoryItems: null
+            labelRepository: null,
+            labelRepositoryItems: null
         };
     },
 
@@ -42,12 +42,12 @@ export default {
     },
 
     created() {
-        this.repository = this.repositoryFactory.create('sidworks_product_labels');
+        this.labelRepository = this.repositoryFactory.create('sidworks_product_labels');
 
-        this.repository
+        this.labelRepository
             .search(new Criteria(), Shopware.Context.api)
             .then((result) => {
-                this.repositoryItems = result;
+                this.labelRepositoryItems = result;
             });
     }
 };

@@ -6,22 +6,33 @@ export default {
     template,
 
     inject: [
-        'repositoryFactory'
+        'repositoryFactory',
+        'acl',
     ],
+
     mixins: [
         Mixin.getByName('notification')
     ],
+
     shortcuts: {
         'SYSTEMKEY+S': 'onSave',
         ESCAPE: 'onCancel',
+    },
+
+    props: {
+        labelId: {
+            type: String,
+            required: false,
+            default: null
+        }
     },
 
     data() {
         return {
             isLoading: false,
             processSuccess: false,
-            entity: null,
-            repository: null
+            label: null,
+            labelRepository: null
         };
     },
 
@@ -51,47 +62,56 @@ export default {
         onSave() {
             this.isLoading = true;
 
-            this.repository.save(this.entity, Shopware.Context.api).then(() => {
-                this.getEntity();
-                this.isLoading = false;
-                this.processSuccess = true;
-            }).catch((exception) => {
-                this.isLoading = false;
-                this.createNotificationError({
-                    title: this.$tc('global.default.error'),
-                    message: exception.toString(),
-                    autoClose: true,
+            return this.labelRepository
+                .save(this.label, Shopware.Context.api)
+                .then(() => {
+                    if (!this.labelId) {
+                        this.$router.push({
+                            name: 'sidworks.product.labels.detail',
+                            params: {
+                                id: this.label.id
+                            }
+                        });
+                    }
+                    this.getLabel();
+                    this.isLoading = false;
+                    this.processSuccess = true;
+                }).catch((exception) => {
+                    this.isLoading = false;
+                    if (this.label.name && this.label.name.length) {
+                        this.createNotificationError({
+                            title: 'Error',
+                            message: exception
+                        });
+                    }
                 });
-            });
         },
 
         onCancel() {
-            this.$router.push({ name: 'sidworks.product.labels.index' });
+            this.$router.push({name: 'sidworks.product.labels.index'});
         },
 
         saveFinish() {
             this.processSuccess = false;
         },
 
-        getEntity() {
-            let id = this.$route.params.id;
-            if (id) {
-                this.repository
-                    .get(this.$route.params.id, Shopware.Context.api)
-                    .then((entity) => {
-                        this.entity = entity;
-                        this.entityId = entity.id;
+        getLabel() {
+            if (this.labelId || this.label?.id) {
+                this.labelRepository
+                    .get(this.labelId || this.label?.id, Shopware.Context.api)
+                    .then((label) => {
+                        this.label = label;
                     });
             } else {
-                this.entity = this.repository.create(Shopware.Context.api);
+                this.label = this.labelRepository.create(Shopware.Context.api);
             }
-        }
+        },
     },
 
     created() {
-        this.repository = this.repositoryFactory.create('sidworks_product_labels');
+        this.labelRepository = this.repositoryFactory.create('sidworks_product_labels');
         this.salesChannelRepository = this.repositoryFactory.create('sales_channel');
 
-        this.getEntity();
+        this.getLabel();
     }
 };

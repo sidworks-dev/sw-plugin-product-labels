@@ -1,3 +1,4 @@
+import './acl';
 import enGB from './snippet/en-GB.json';
 
 const { Module } = Shopware;

@@ -17,9 +17,9 @@
         {% block sidworks_product_labels_list_content %}
             <template #content>
                 <sw-entity-listing
-                        v-if="repositoryItems && repositoryItems.length > 0"
-                        :items="repositoryItems"
-                        :repository="repository"
+                        v-if="labelRepositoryItems && labelRepositoryItems.length > 0"
+                        :items="labelRepositoryItems"
+                        :repository="labelRepository"
                         :showSelection="false"
                         :columns="columns"
                         detailRoute="sidworks.product.labels.detail"
