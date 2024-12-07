@@ -39,8 +39,8 @@ class ProductLabelsDefinition extends EntityDefinition
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 (new BoolField('active', 'active'))->addFlags(new Required()),
-                (new TranslatedField('name', 'name'))->addFlags(new Required()),
-                (new TranslatedField('content', 'content'))->addFlags(new Required()),
+                (new TranslatedField('name'))->addFlags(new Required()),
+                (new TranslatedField('content'))->addFlags(new Required()),
                 (new StringField('background_color', 'backgroundColor'))->addFlags(new Required()),
                 (new StringField('text_color', 'textColor'))->addFlags(new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
