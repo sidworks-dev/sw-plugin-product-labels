@@ -22,6 +22,21 @@ export default {
         };
     },
 
+    methods: {
+        getList() {
+            this.labelRepository
+                .search(new Criteria(), Shopware.Context.api)
+                .then((result) => {
+                    this.labelRepositoryItems = result;
+                });
+        },
+
+        onChangeLanguage(languageId) {
+            Shopware.State.commit('context/setApiLanguageId', languageId)
+            this.getList();
+        }
+    },
+
     computed: {
         columns() {
             return [{
@@ -43,11 +58,6 @@ export default {
 
     created() {
         this.labelRepository = this.repositoryFactory.create('sidworks_product_labels');
-
-        this.labelRepository
-            .search(new Criteria(), Shopware.Context.api)
-            .then((result) => {
-                this.labelRepositoryItems = result;
-            });
+        this.getList();
     }
 };

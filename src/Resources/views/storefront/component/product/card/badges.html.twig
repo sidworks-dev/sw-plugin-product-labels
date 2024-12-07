@@ -9,12 +9,12 @@
         {% if sidworksProductLabels and sidworksProductLabels.all|length > 0 %}
             {% block component_sidworks_product_badges_elements %}
                 {% for sidworksProductLabel in sidworksProductLabels.all %}
-                    <div>
+                    <div data-sidworks-product-label-id="{{ sidworksProductLabel.id }}">
                         <span
                             class="badge badge-sidworks-product-labels-label"
                             style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
                         >
-                            {{ sidworksProductLabel.content|escape|sw_sanitize }}
+                            {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
                         </span>
                     </div>
                 {% endfor %}

@@ -7,6 +7,7 @@ export default {
 
     inject: [
         'repositoryFactory',
+        'context',
         'acl',
     ],
 
@@ -27,6 +28,12 @@ export default {
         }
     },
 
+    metaInfo() {
+        return {
+            title: this.$createTitle()
+        };
+    },
+
     data() {
         return {
             isLoading: false,
@@ -37,10 +44,6 @@ export default {
     },
 
     computed: {
-        identifier() {
-            return this.placeholder('HIER', 'name');
-        },
-
         tooltipSave() {
             const systemKey = this.$device.getSystemKey();
 
@@ -55,7 +58,7 @@ export default {
                 message: 'ESC',
                 appearance: 'light',
             };
-        }
+        },
     },
 
     methods: {
@@ -105,6 +108,20 @@ export default {
             } else {
                 this.label = this.labelRepository.create(Shopware.Context.api);
             }
+        },
+        onChangeLanguage(languageId) {
+            Shopware.State.commit('context/setApiLanguageId', languageId)
+            this.getLabel();
+        },
+
+        saveOnLanguageChange() {
+            return this.onSave();
+        },
+
+        abortOnLanguageChange() {
+            this.getLabel();
+            this.isLoading = false;
+            this.processSuccess = false;
         },
     },
 

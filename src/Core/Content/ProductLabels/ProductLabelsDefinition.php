@@ -10,8 +10,11 @@ use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslatedField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslationsAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\FieldCollection;
 use Shopware\Core\Content\ProductStream\ProductStreamDefinition;
+use Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation\ProductLabelsTranslationDefinition;
 
 class ProductLabelsDefinition extends EntityDefinition
 {
@@ -36,12 +39,13 @@ class ProductLabelsDefinition extends EntityDefinition
             [
                 (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
                 (new BoolField('active', 'active'))->addFlags(new Required()),
-                (new StringField('name', 'name'))->addFlags(new Required()),
-                (new StringField('content', 'content'))->addFlags(new Required()),
+                (new TranslatedField('name', 'name'))->addFlags(new Required()),
+                (new TranslatedField('content', 'content'))->addFlags(new Required()),
                 (new StringField('background_color', 'backgroundColor'))->addFlags(new Required()),
                 (new StringField('text_color', 'textColor'))->addFlags(new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
-                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required())
+                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required()),
+                (new TranslationsAssociationField(ProductLabelsTranslationDefinition::class, 'sidworks_product_labels_id'))
             ]
         );
     }

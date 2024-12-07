@@ -43,8 +43,11 @@
                                 <sw-text-field
                                         label="Label internal name"
                                         v-model:value="label.name"
+                                        validation="required"
+                                        :error="customerLastNameError"
                                         required
-                                />
+                                >
+                                </sw-text-field>
 
                                 <sw-entity-multi-id-select
                                         label="Sales Channels"

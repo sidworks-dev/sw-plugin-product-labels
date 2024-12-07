@@ -10,9 +10,8 @@ bin/console plugin:install --activate SidworksProductLabels
 
 ## Todo
 ### Administration
-- Determine label position in administration
-- Make translation work
 - Add from/to date (optional setting)
+- Determine label position in administration
 - Add ACL
 
 ### Storefront

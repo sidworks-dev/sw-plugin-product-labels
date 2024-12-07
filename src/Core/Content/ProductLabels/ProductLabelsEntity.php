@@ -6,13 +6,28 @@ use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 class ProductLabelsEntity extends Entity
 {
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
     public function getProductStreamId(): ?string
     {
         return $this->productStreamId;
     }
 
-    public function getId(): ?string
+    public function getBackgroundColor(): ?string
     {
-        return $this->id;
+        return $this->backgroundColor;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
     }
 }
