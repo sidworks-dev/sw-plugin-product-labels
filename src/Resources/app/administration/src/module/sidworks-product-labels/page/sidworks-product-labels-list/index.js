@@ -1,6 +1,6 @@
 import template from './sidworks-product-labels-list.html.twig';
 
-const { Criteria } = Shopware.Data;
+const {Criteria} = Shopware.Data;
 
 export default {
     template,
@@ -38,21 +38,46 @@ export default {
     },
 
     computed: {
+        dateFilter() {
+            return Shopware.Filter.getByName('date');
+        },
         columns() {
-            return [{
-                property: 'name',
-                dataIndex: 'name',
-                label: this.$t('sidworks-product-labels.list.name'),
-                routerLink: 'sidworks.product.labels.detail',
-                allowResize: true,
-                primary: true
-            }, {
-                property: 'active',
-                label: this.$t('sidworks-product-labels.list.active'),
-                inlineEdit: 'boolean',
-                allowResize: true,
-                align: 'center',
-            }];
+            return [
+                {
+                    property: 'name',
+                    dataIndex: 'name',
+                    label: this.$t('sidworks-product-labels.list.name'),
+                    routerLink: 'sidworks.product.labels.detail',
+                    allowResize: true,
+                    primary: true
+                }, {
+                    property: 'active',
+                    label: this.$t('sidworks-product-labels.list.active'),
+                    inlineEdit: 'boolean',
+                    allowResize: true,
+                    align: 'center',
+                }, {
+                    property: 'fromToActive',
+                    label: "Scheduler",
+                    inlineEdit: 'boolean',
+                    allowResize: true,
+                    align: 'center',
+                },
+                {
+                    property: 'fromDateTime',
+                    label: "From",
+                    inlineEdit: 'date',
+                    allowResize: true,
+                    align: 'center',
+                },
+                {
+                    property: 'toDateTime',
+                    label: "To",
+                    inlineEdit: 'date',
+                    allowResize: true,
+                    align: 'center',
+                }
+            ];
         }
     },
 

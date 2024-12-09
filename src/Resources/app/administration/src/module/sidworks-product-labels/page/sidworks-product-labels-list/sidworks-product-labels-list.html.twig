@@ -23,7 +23,15 @@
                         :showSelection="false"
                         :columns="columns"
                         detailRoute="sidworks.product.labels.detail"
-                />
+                >
+                    <template #column-fromDateTime="{ item }">
+                        {{ dateFilter(item.fromDateTime, { hour: '2-digit', minute: '2-digit' }) }}
+                    </template>
+
+                    <template #column-toDateTime="{ item }">
+                        {{ dateFilter(item.toDateTime, { hour: '2-digit', minute: '2-digit' }) }}
+                    </template>
+                </sw-entity-listing>
             </template>
         {% endblock %}
     </sw-page>
