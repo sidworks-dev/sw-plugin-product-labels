@@ -1,5 +1,12 @@
 {% block sidworks_product_labels_list %}
     <sw-page>
+        <template #smart-bar-header>
+            <h2>
+                Product Labels
+                <span v-if="!isLoading" class="sw-page__smart-bar-amount">({{ total }})</span>
+            </h2>
+        </template>
+
         {% block sidworks_product_labels_list_language_switch %}
             <template #language-switch>
                 <sw-language-switch @on-change="onChangeLanguage"/>
@@ -23,6 +30,7 @@
                         :showSelection="false"
                         :columns="columns"
                         detailRoute="sidworks.product.labels.detail"
+                        @update-records="updateTotal"
                 >
                     <template #column-fromDateTime="{ item }">
                         {{ dateFilter(item.fromDateTime, { hour: '2-digit', minute: '2-digit' }) }}

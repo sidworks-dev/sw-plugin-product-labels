@@ -1,25 +1,29 @@
 {% block sidworks_product_labels_detail %}
     <sw-page>
+        <template #smart-bar-header>
+            <h2>{{ placeholder(label, 'name', 'Product Label') }}</h2>
+        </template>
+
         <template #language-switch>
             <sw-language-switch @on-change="onChangeLanguage"/>
         </template>
 
         <template #smart-bar-actions>
             <sw-button
-                    v-tooltip.bottom="tooltipCancel"
-                    :disabled="isLoading"
-                    @click="onCancel"
+                v-tooltip.bottom="tooltipCancel"
+                :disabled="isLoading"
+                @click="onCancel"
             >
                 {{ $tc('global.default.cancel') }}
             </sw-button>
 
             <sw-button-process
-                    v-tooltip.bottom="tooltipSave"
-                    :isLoading="isLoading"
-                    :processSuccess="processSuccess"
-                    variant="primary"
-                    @click.prevent="onSave"
-                    @update:process-success="saveFinish"
+                v-tooltip.bottom="tooltipSave"
+                :isLoading="isLoading"
+                :processSuccess="processSuccess"
+                variant="primary"
+                @click.prevent="onSave"
+                @update:process-success="saveFinish"
             >
                 {{ $tc('global.default.save') }}
             </sw-button-process>
@@ -30,47 +34,67 @@
                 <sw-card-view>
                     <template>
                         <sw-card
-                                v-if="label"
-                                :is-loading="isLoading"
-                                title="General settings"
+                            v-if="label"
+                            :is-loading="isLoading"
+                            title="General settings"
                         >
                             <sw-checkbox-field
-                                    label="Enabled"
-                                    v-model:value="label.active"
+                                label="Enabled"
+                                v-model:value="label.active"
                             />
 
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-text-field
-                                        label="Label internal name"
-                                        v-model:value="label.name"
-                                        validation="required"
-                                        :error="customerLastNameError"
-                                        required
+                                    label="Label internal name"
+                                    v-model:value="label.name"
+                                    validation="required"
+                                    :error="customerLastNameError"
+                                    required
                                 >
                                 </sw-text-field>
 
                                 <sw-entity-multi-id-select
-                                        label="Sales Channels"
-                                        :repository="salesChannelRepository"
-                                        v-model:value="label.salesChannelIds"
-                                        required
+                                    label="Sales Channels"
+                                    :repository="salesChannelRepository"
+                                    v-model:value="label.salesChannelIds"
+                                    required
                                 />
                             </sw-container>
 
                             <sw-text-field
-                                    label="Label content"
-                                    v-model:value="label.content"
-                                    required
+                                label="Label content"
+                                v-model:value="label.content"
+                                required
                             />
 
                             <sw-entity-single-select
-                                    label="Dynamic Product Group"
-                                    entity="product_stream"
-                                    v-model:value="label.productStreamId"
-                                    @update:value="onChange"
-                                    required
-                                    show-clearable-button
+                                label="Dynamic Product Group"
+                                entity="product_stream"
+                                v-model:value="label.productStreamId"
+                                @update:value="onChange"
+                                required
+                                show-clearable-button
                             />
+                        </sw-card>
+
+                        <sw-card
+                            v-if="label"
+                            :is-loading="isLoading"
+                            title="Styling"
+                        >
+                            <sw-container columns="1fr 1fr" gap="16px">
+                                <sw-colorpicker
+                                    label="Background color"
+                                    v-model:value="label.backgroundColor"
+                                    required
+                                />
+
+                                <sw-colorpicker
+                                    label="Text color"
+                                    v-model:value="label.textColor"
+                                    required
+                                />
+                            </sw-container>
                         </sw-card>
 
                         <sw-card
@@ -97,26 +121,6 @@
                                         v-model:value="label.toDateTime"
                                         date-type="datetime"
                                         :placeholder="'Select an end date, this can be left empty'"
-                                />
-                            </sw-container>
-                        </sw-card>
-
-                        <sw-card
-                                v-if="label"
-                                :is-loading="isLoading"
-                                title="Styling"
-                        >
-                            <sw-container columns="1fr 1fr" gap="16px">
-                                <sw-colorpicker
-                                        label="Background color"
-                                        v-model:value="label.backgroundColor"
-                                        required
-                                />
-
-                                <sw-colorpicker
-                                        label="Text color"
-                                        v-model:value="label.textColor"
-                                        required
                                 />
                             </sw-container>
                         </sw-card>

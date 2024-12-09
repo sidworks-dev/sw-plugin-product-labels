@@ -12,7 +12,8 @@ export default {
     data() {
         return {
             labelRepository: null,
-            labelRepositoryItems: null
+            labelRepositoryItems: null,
+            total: 0
         };
     },
 
@@ -28,7 +29,12 @@ export default {
                 .search(new Criteria(), Shopware.Context.api)
                 .then((result) => {
                     this.labelRepositoryItems = result;
+                    this.total = result.total;
                 });
+        },
+
+        updateTotal({ total }) {
+            this.total = total;
         },
 
         onChangeLanguage(languageId) {

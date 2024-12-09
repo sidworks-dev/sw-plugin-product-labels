@@ -12,6 +12,7 @@ bin/console plugin:install --activate SidworksProductLabels
 ### Administration
 - Determine label position in administration
 - Add ACL
+- Use snippets
 
 ### Storefront
 - When label has position, make sure to position them correctly

@@ -12,7 +12,7 @@ export default {
     ],
 
     mixins: [
-        Mixin.getByName('notification')
+        'placeholder',
     ],
 
     shortcuts: {
@@ -30,7 +30,7 @@ export default {
 
     metaInfo() {
         return {
-            title: this.$createTitle()
+            title: this.$createTitle(this.identifier),
         };
     },
 
@@ -44,6 +44,10 @@ export default {
     },
 
     computed: {
+        identifier() {
+            return this.placeholder(this.label, 'name');
+        },
+
         tooltipSave() {
             const systemKey = this.$device.getSystemKey();
 
