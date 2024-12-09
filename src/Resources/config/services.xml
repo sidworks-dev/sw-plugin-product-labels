@@ -4,11 +4,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsDefinition">
-            <tag name="shopware.entity.definition" />
+            <tag name="shopware.entity.definition"/>
         </service>
 
-        <service id="Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation\ProductLabelsTranslationDefinition">
-            <tag name="shopware.entity.definition" />
+        <service
+                id="Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation\ProductLabelsTranslationDefinition">
+            <tag name="shopware.entity.definition"/>
         </service>
 
         <service id="Sidworks\ProductLabels\Service\LabelStreamService">
@@ -20,6 +21,16 @@
         <service id="Sidworks\ProductLabels\Storefront\Page\Product\Subscriber\PageSubscriber">
             <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
             <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Sidworks\ProductLabels\ScheduledTask\LabelsTask">
+            <tag name="shopware.scheduled.task"/>
+        </service>
+
+        <service id="Sidworks\ProductLabels\ScheduledTask\LabelsTaskHandler">
+            <argument type="service" id="scheduled_task.repository"/>
+            <argument type="service" id="logger"/>
+            <tag name="messenger.message_handler"/>
         </service>
     </services>
 </container>
