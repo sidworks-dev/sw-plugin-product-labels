@@ -9,6 +9,6 @@ class LabelsTaskHandler extends ScheduledTaskHandler
 {
     public function run(): void
     {
-
+        // TODO: Add functionality to enable/disable labels automatically based on from / to dates + time
     }
 }
