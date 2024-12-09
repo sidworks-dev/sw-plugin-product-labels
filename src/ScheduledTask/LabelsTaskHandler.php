@@ -9,6 +9,6 @@ class LabelsTaskHandler extends ScheduledTaskHandler
 {
     public function run(): void
     {
-        $this->exceptionLogger->info('Test log: LabelsTaskHandler executed.');
+
     }
 }
