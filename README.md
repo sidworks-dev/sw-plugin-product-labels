@@ -10,7 +10,6 @@ bin/console plugin:install --activate SidworksProductLabels
 
 ## Todo
 ### Administration
-- Add from/to date (optional setting), make it work with a cronjob that enabled/disables the label automatically
 - Determine label position in administration
 - Add ACL
 

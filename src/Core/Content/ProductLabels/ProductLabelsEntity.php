@@ -26,6 +26,26 @@ class ProductLabelsEntity extends Entity
         return $this->backgroundColor;
     }
 
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive($value)
+    {
+        return $this->active = $value;
+    }
+
+    public function getFromDateTime()
+    {
+        return $this->fromDateTime;
+    }
+
+    public function getToDateTime()
+    {
+        return $this->toDateTime;
+    }
+
     public function getTextColor(): ?string
     {
         return $this->textColor;
