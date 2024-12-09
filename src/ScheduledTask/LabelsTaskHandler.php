@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -29,6 +30,8 @@ class LabelsTaskHandler extends ScheduledTaskHandler
     {
         $context = Context::createDefaultContext();
         $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('fromToActive', 1));
+
         $now = new \DateTimeImmutable();
 
         $productLabels = $this->productLabelsRepository

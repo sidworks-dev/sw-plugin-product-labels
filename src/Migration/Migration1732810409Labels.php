@@ -25,6 +25,7 @@ class Migration1732810409Labels extends MigrationStep
             `content` VARCHAR(255),
             `background_color` VARCHAR(255),
             `text_color` VARCHAR(255),
+            `from_to_active` tinyint(3) unsigned NOT NULL DEFAULT 0,
             `from_date_time` DATETIME(3) NULL,
             `to_date_time` DATETIME(3) NULL,
             `product_stream_id` BINARY(16) NOT NULL,

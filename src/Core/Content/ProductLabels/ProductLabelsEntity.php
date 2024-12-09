@@ -46,6 +46,11 @@ class ProductLabelsEntity extends Entity
         return $this->toDateTime;
     }
 
+    public function getFromToActive()
+    {
+        return $this->fromToActive;
+    }
+
     public function getTextColor(): ?string
     {
         return $this->textColor;

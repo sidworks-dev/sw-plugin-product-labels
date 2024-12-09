@@ -46,6 +46,7 @@ class ProductLabelsDefinition extends EntityDefinition
                 (new StringField('text_color', 'textColor'))->addFlags(new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
                 (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required()),
+                (new BoolField('from_to_active', 'fromToActive')),
                 (new DateTimeField('from_date_time', 'fromDateTime')),
                 (new DateTimeField('to_date_time', 'toDateTime')),
                 (new TranslationsAssociationField(ProductLabelsTranslationDefinition::class, 'sidworks_product_labels_id'))

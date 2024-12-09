@@ -32,7 +32,7 @@
                         <sw-card
                                 v-if="label"
                                 :is-loading="isLoading"
-                                title="Label general settings"
+                                title="General settings"
                         >
                             <sw-checkbox-field
                                     label="Enabled"
@@ -55,19 +55,6 @@
                                         v-model:value="label.salesChannelIds"
                                         required
                                 />
-
-                                <sw-datepicker
-                                        label="Active From Date"
-                                        v-model:value="label.fromDateTime"
-                                        dateType="datetime-local"
-                                        :placeholder="'Select a start date, this can be left empty'"
-                                />
-                                <sw-datepicker
-                                        label="Active To Date"
-                                        v-model:value="label.toDateTime"
-                                        dateType="datetime-local"
-                                        :placeholder="'Select an end date, this can be left empty'"
-                                />
                             </sw-container>
 
                             <sw-text-field
@@ -89,7 +76,35 @@
                         <sw-card
                                 v-if="label"
                                 :is-loading="isLoading"
-                                title="Label styling"
+                                title="Scheduling"
+                        >
+                            <sw-checkbox-field
+                                    label="Schedule enabled"
+                                    v-model:value="label.fromToActive"
+                            />
+
+                            <sw-container columns="1fr 1fr" gap="16px">
+                                <sw-datepicker
+                                        :disabled="!label.fromToActive"
+                                        label="Active From Date"
+                                        v-model:value="label.fromDateTime"
+                                        dateType="datetime"
+                                        :placeholder="'Select a start date, this can be left empty'"
+                                />
+                                <sw-datepicker
+                                        :disabled="!label.fromToActive"
+                                        label="Active To Date"
+                                        v-model:value="label.toDateTime"
+                                        dateType="datetime"
+                                        :placeholder="'Select an end date, this can be left empty'"
+                                />
+                            </sw-container>
+                        </sw-card>
+
+                        <sw-card
+                                v-if="label"
+                                :is-loading="isLoading"
+                                title="Styling"
                         >
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-colorpicker
