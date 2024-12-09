@@ -55,6 +55,19 @@
                                         v-model:value="label.salesChannelIds"
                                         required
                                 />
+
+                                <sw-datepicker
+                                        label="Active From Date"
+                                        v-model:value="label.fromDateTime"
+                                        dateType="datetime-local"
+                                        :placeholder="'Select a start date, this can be left empty'"
+                                />
+                                <sw-datepicker
+                                        label="Active To Date"
+                                        v-model:value="label.toDateTime"
+                                        dateType="datetime-local"
+                                        :placeholder="'Select an end date, this can be left empty'"
+                                />
                             </sw-container>
 
                             <sw-text-field

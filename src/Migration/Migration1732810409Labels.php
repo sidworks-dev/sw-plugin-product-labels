@@ -8,7 +8,7 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 /**
  * @internal
  */
-class Migration1732810409SetupTable extends MigrationStep
+class Migration1732810409Labels extends MigrationStep
 {
     public function getCreationTimestamp(): int
     {
@@ -25,7 +25,10 @@ class Migration1732810409SetupTable extends MigrationStep
             `content` VARCHAR(255),
             `background_color` VARCHAR(255),
             `text_color` VARCHAR(255),
+            `from_date_time` DATETIME(3) NULL,
+            `to_date_time` DATETIME(3) NULL,
             `product_stream_id` BINARY(16) NOT NULL,
+            `sales_channels` JSON NOT NULL,
             `created_at` DATETIME(3) NOT NULL,
             `updated_at` DATETIME(3) NULL,
              PRIMARY KEY (`id`),

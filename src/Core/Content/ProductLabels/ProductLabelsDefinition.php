@@ -4,6 +4,7 @@ namespace Sidworks\ProductLabels\Core\Content\ProductLabels;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
@@ -45,6 +46,8 @@ class ProductLabelsDefinition extends EntityDefinition
                 (new StringField('text_color', 'textColor'))->addFlags(new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
                 (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required()),
+                (new DateTimeField('from_date_time', 'fromDateTime')),
+                (new DateTimeField('to_date_time', 'toDateTime')),
                 (new TranslationsAssociationField(ProductLabelsTranslationDefinition::class, 'sidworks_product_labels_id'))
             ]
         );
