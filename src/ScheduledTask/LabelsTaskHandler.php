@@ -43,7 +43,7 @@ class LabelsTaskHandler extends ScheduledTaskHandler
         }
 
         foreach ($productLabels as $productLabel) {
-            $newActive = $this->labelStreamService->shouldShowLabel($productLabel);
+            $newActive = $this->labelStreamService->shouldShowProductLabel($productLabel);
 
             if ($productLabel->getActive() !== $newActive) {
                 $this->productLabelsRepository->update([

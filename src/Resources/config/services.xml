@@ -23,7 +23,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="Sidworks\ProductLabels\ScheduledTask\LabelsTask">
+        <!--<service id="Sidworks\ProductLabels\ScheduledTask\LabelsTask">
             <tag name="shopware.scheduled.task"/>
         </service>
 
@@ -32,6 +32,6 @@
             <argument type="service" id="sidworks_product_labels.repository"/>
             <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
             <tag name="messenger.message_handler"/>
-        </service>
+        </service>-->
     </services>
 </container>

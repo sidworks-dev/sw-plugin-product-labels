@@ -9,6 +9,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Struct\ArrayEntity;
+use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsEntity;
 
 class LabelStreamService
 {
@@ -32,6 +33,10 @@ class LabelStreamService
 
         $productLabelStreamItems = [];
         foreach ($productLabels as $productLabel) {
+            if (!$this->shouldShowProductLabel($productLabel)) {
+                continue;
+            }
+
             $productStreamFilters = $this->productStreamBuilder->buildFilters(
                 $productLabel->getProductStreamId(),
                 $context
@@ -69,8 +74,13 @@ class LabelStreamService
             $product->addExtension(self::SIDWORKS_PRODUCT_LABELS_EXTENSION, $sidworksProductLabels);
         }
     }
-    public function shouldShowLabel($productLabel): bool
+
+    public function shouldShowProductLabel(ProductLabelsEntity $productLabel): bool
     {
+        if (!$productLabel->getFromToActive()) {
+            return $productLabel->getActive();
+        }
+
         $now = new \DateTimeImmutable();
         $fromDateTime = $productLabel->getFromDateTime();
         $toDateTime = $productLabel->getToDateTime();
