@@ -69,4 +69,17 @@ class LabelStreamService
             $product->addExtension(self::SIDWORKS_PRODUCT_LABELS_EXTENSION, $sidworksProductLabels);
         }
     }
+    public function shouldShowLabel($productLabel): bool
+    {
+        $now = new \DateTimeImmutable();
+        $fromDateTime = $productLabel->getFromDateTime();
+        $toDateTime = $productLabel->getToDateTime();
+
+        return match (true) {
+            $fromDateTime && $fromDateTime > $now => false,
+            $toDateTime && $toDateTime < $now => false,
+            $fromDateTime && $fromDateTime <= $now && (!$toDateTime || $toDateTime >= $now) => true,
+            default => $productLabel->getActive()
+        };
+    }
 }

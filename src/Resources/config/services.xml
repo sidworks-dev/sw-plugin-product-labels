@@ -30,6 +30,7 @@
         <service id="Sidworks\ProductLabels\ScheduledTask\LabelsTaskHandler">
             <argument type="service" id="scheduled_task.repository" />
             <argument type="service" id="sidworks_product_labels.repository"/>
+            <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
             <tag name="messenger.message_handler"/>
         </service>
     </services>

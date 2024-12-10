@@ -8,6 +8,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskHandler;
+use Sidworks\ProductLabels\Service\LabelStreamService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(handles: LabelsTask::class)]
@@ -16,6 +17,7 @@ class LabelsTaskHandler extends ScheduledTaskHandler
     public function __construct(
         EntityRepository $scheduledTaskRepository,
         private readonly EntityRepository $productLabelsRepository,
+        private readonly LabelStreamService $labelStreamService,
         ?LoggerInterface $exceptionLogger = null
     ) {
         parent::__construct($scheduledTaskRepository, $exceptionLogger);
@@ -32,8 +34,6 @@ class LabelsTaskHandler extends ScheduledTaskHandler
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('fromToActive', 1));
 
-        $now = new \DateTimeImmutable();
-
         $productLabels = $this->productLabelsRepository
             ->search($criteria, $context)
             ->getEntities();
@@ -43,15 +43,7 @@ class LabelsTaskHandler extends ScheduledTaskHandler
         }
 
         foreach ($productLabels as $productLabel) {
-            $fromDateTime = $productLabel->getFromDateTime();
-            $toDateTime = $productLabel->getToDateTime();
-
-            $newActive = match (true) {
-                $fromDateTime && $fromDateTime > $now => false,
-                $toDateTime && $toDateTime < $now => false,
-                $fromDateTime && $fromDateTime <= $now && (!$toDateTime || $toDateTime >= $now) => true,
-                default => $productLabel->getActive()
-            };
+            $newActive = $this->labelStreamService->shouldShowLabel($productLabel);
 
             if ($productLabel->getActive() !== $newActive) {
                 $this->productLabelsRepository->update([
