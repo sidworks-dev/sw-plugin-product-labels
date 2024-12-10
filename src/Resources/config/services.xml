@@ -7,8 +7,7 @@
             <tag name="shopware.entity.definition"/>
         </service>
 
-        <service
-                id="Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation\ProductLabelsTranslationDefinition">
+        <service id="Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation\ProductLabelsTranslationDefinition">
             <tag name="shopware.entity.definition"/>
         </service>
 
