@@ -1,6 +1,7 @@
 import template from './sidworks-product-labels-detail.html.twig';
 
-const {Mixin} = Shopware;
+const { Mixin } = Shopware;
+const { mapPropertyErrors } = Shopware.Component.getComponentHelper();
 
 export default {
     template,
@@ -12,7 +13,8 @@ export default {
     ],
 
     mixins: [
-        'placeholder',
+        Mixin.getByName('placeholder'),
+        Mixin.getByName('notification')
     ],
 
     shortcuts: {
@@ -63,6 +65,15 @@ export default {
                 appearance: 'light',
             };
         },
+
+        ...mapPropertyErrors('label', [
+            'name',
+            'salesChannelIds',
+            'productStreamId',
+            'content',
+            'backgroundColor',
+            'textColor'
+        ]),
     },
 
     methods: {
@@ -85,12 +96,7 @@ export default {
                     this.processSuccess = true;
                 }).catch((exception) => {
                     this.isLoading = false;
-                    if (this.label.name && this.label.name.length) {
-                        this.createNotificationError({
-                            title: 'Error',
-                            message: exception
-                        });
-                    }
+                    this.showErrorNotification();
                 });
         },
 
@@ -126,6 +132,12 @@ export default {
             this.getLabel();
             this.isLoading = false;
             this.processSuccess = false;
+        },
+
+        showErrorNotification() {
+            this.createNotificationError({
+                message: this.$tc('global.notification.notificationSaveErrorMessageRequiredFieldsInvalid'),
+            });
         },
     },
 

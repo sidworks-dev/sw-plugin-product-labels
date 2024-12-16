@@ -47,8 +47,7 @@
                                 <sw-text-field
                                     label="Label internal name"
                                     v-model:value="label.name"
-                                    validation="required"
-                                    :error="customerLastNameError"
+                                    :error="labelNameError"
                                     required
                                 >
                                 </sw-text-field>
@@ -57,6 +56,7 @@
                                     label="Sales Channels"
                                     :repository="salesChannelRepository"
                                     v-model:value="label.salesChannelIds"
+                                    :error="labelSalesChannelIdsError"
                                     required
                                 />
                             </sw-container>
@@ -64,6 +64,7 @@
                             <sw-text-field
                                 label="Label content"
                                 v-model:value="label.content"
+                                :error="labelContentError"
                                 required
                             />
 
@@ -72,6 +73,7 @@
                                 entity="product_stream"
                                 v-model:value="label.productStreamId"
                                 @update:value="onChange"
+                                :error="labelProductStreamIdError"
                                 required
                                 show-clearable-button
                             />
@@ -86,12 +88,14 @@
                                 <sw-colorpicker
                                     label="Background color"
                                     v-model:value="label.backgroundColor"
+                                    :error="labelBackgroundColorError"
                                     required
                                 />
 
                                 <sw-colorpicker
                                     label="Text color"
                                     v-model:value="label.textColor"
+                                    :error="labelTextColorError"
                                     required
                                 />
                             </sw-container>
