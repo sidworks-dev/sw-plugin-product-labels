@@ -73,7 +73,7 @@ export default {
             'content',
             'backgroundColor',
             'textColor'
-        ]),
+        ])
     },
 
     methods: {
