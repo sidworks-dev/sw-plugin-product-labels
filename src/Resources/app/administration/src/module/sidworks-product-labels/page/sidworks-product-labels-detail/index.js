@@ -69,8 +69,8 @@ export default {
         ...mapPropertyErrors('label', [
             'name',
             'salesChannelIds',
-            'productStreamId',
             'content',
+            'productStreamId',
             'backgroundColor',
             'textColor'
         ])
@@ -120,7 +120,7 @@ export default {
             }
         },
         onChangeLanguage(languageId) {
-            Shopware.State.commit('context/setApiLanguageId', languageId)
+            Shopware.State.commit('context/setApiLanguageId', languageId);
             this.getLabel();
         },
 

@@ -13,9 +13,9 @@ bin/console plugin:install --activate SidworksProductLabels
 - Determine label position in administration
 - Add ACL
 - Use snippets
+- Make changing empty label language work
 
 ### Storefront
 - When label has position, make sure to position them correctly
 - Add option to use {{ product.variable }} in content of label
-- Make it work on product pages
 - Add enable on product page, category

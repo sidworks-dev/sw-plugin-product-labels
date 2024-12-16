@@ -5,10 +5,10 @@ namespace Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\{EntityTranslationDefinition,
     Field\Flag\AllowHtml,
+    Field\Flag\ApiAware,
     Field\Flag\Required,
     Field\StringField,
-    FieldCollection
-};
+    FieldCollection};
 
 class ProductLabelsTranslationDefinition extends EntityTranslationDefinition
 {
@@ -36,8 +36,8 @@ class ProductLabelsTranslationDefinition extends EntityTranslationDefinition
     protected function defineFields(): FieldCollection
     {
         return new FieldCollection([
-            (new StringField('name', 'name', 255))->addFlags(new Required()),
-            (new StringField('content', 'content', 255))->addFlags(new Required(), new AllowHtml(false))
+            (new StringField('name', 'name', 255))->addFlags(new ApiAware(), new Required()),
+            (new StringField('content', 'content', 255))->addFlags(new ApiAware(), new Required()),
         ]);
     }
 

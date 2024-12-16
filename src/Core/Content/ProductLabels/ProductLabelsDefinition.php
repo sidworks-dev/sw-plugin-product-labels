@@ -6,6 +6,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
@@ -38,14 +39,14 @@ class ProductLabelsDefinition extends EntityDefinition
     {
         return new FieldCollection(
             [
-                (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
-                (new BoolField('active', 'active'))->addFlags(new Required()),
-                (new TranslatedField('name'))->addFlags(new Required()),
-                (new TranslatedField('content'))->addFlags(new Required()),
-                (new StringField('background_color', 'backgroundColor'))->addFlags(new Required()),
-                (new StringField('text_color', 'textColor'))->addFlags(new Required()),
-                (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new Required()),
-                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new Required()),
+                (new IdField('id', 'id'))->addFlags(new ApiAware(), new Required(), new PrimaryKey()),
+                (new BoolField('active', 'active'))->addFlags(new ApiAware(), new Required()),
+                (new TranslatedField('name'))->addFlags(new ApiAware(), new Required()),
+                (new TranslatedField('content'))->addFlags(new ApiAware(), new Required()),
+                (new StringField('background_color', 'backgroundColor'))->addFlags(new ApiAware(), new Required()),
+                (new StringField('text_color', 'textColor'))->addFlags(new ApiAware(), new Required()),
+                (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new ApiAware(), new Required()),
+                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new ApiAware(), new Required()),
                 (new BoolField('from_to_active', 'fromToActive')),
                 (new DateTimeField('from_date_time', 'fromDateTime')),
                 (new DateTimeField('to_date_time', 'toDateTime')),
