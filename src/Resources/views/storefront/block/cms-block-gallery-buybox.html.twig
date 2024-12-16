@@ -1,0 +1,9 @@
+{% sw_extends '@Storefront/storefront/block/cms-block-gallery-buybox.html.twig' %}
+
+{% block block_gallery_buybox_column_left_inner %}
+    {{ parent() }}
+
+    {% sw_include '@Storefront/storefront/component/product/card/badges.html.twig' with {
+        product: page.product
+    } %}
+{% endblock %}
