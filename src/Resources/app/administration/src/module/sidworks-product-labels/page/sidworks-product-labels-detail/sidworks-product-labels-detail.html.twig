@@ -38,9 +38,10 @@
                             :is-loading="isLoading"
                             title="General settings"
                         >
-                            <sw-checkbox-field
+                            <sw-switch-field
                                 label="Enabled"
                                 v-model:value="label.active"
+                                :style="{ marginTop: '0' }"
                             />
 
                             <sw-container columns="1fr 1fr" gap="16px">
