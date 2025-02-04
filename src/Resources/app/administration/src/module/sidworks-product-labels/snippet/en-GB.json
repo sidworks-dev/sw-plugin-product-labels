@@ -1,16 +1,23 @@
 {
-  "sidworks-product-labels": {
-    "general": {
-      "pluginTitle": "Product Labels",
-      "pluginDescription": "Manage product labels"
+    "sw-privileges": {
+        "permissions": {
+            "sidworks_product_labels": {
+                "label": "Sidworks Product Labels"
+            }
+        }
     },
-    "list": {
-      "name": "Name",
-      "active": "Active",
-      "addButtonText": "Add label"
-    },
-    "detail": {
-      "name": "Name"
+    "sidworks-product-labels": {
+        "general": {
+            "pluginTitle": "Product Labels",
+            "pluginDescription": "Manage product labels"
+        },
+        "list": {
+            "name": "Name",
+            "active": "Active",
+            "addButtonText": "Add label"
+        },
+        "detail": {
+            "name": "Name"
+        }
     }
-  }
 }
