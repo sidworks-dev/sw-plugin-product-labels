@@ -5,12 +5,11 @@
         {% block component_sidworks_product_badges_elements %}
             {% for sidworksProductLabel in sidworksProductLabels.all %}
                 <div data-sidworks-product-label-id="{{ sidworksProductLabel.id }}">
-                        <span
-                                class="badge badge-sidworks-product-labels-label"
-                                style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
-                        >
-                            {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
-                        </span>
+                    <span class="badge badge-sidworks-product-labels-label"
+                          style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
+                    >
+                        {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
+                    </span>
                 </div>
             {% endfor %}
         {% endblock %}
