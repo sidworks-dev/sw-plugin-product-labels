@@ -11,6 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
+
+    public $hasSet = false;
+
     public function __construct(
         private readonly LabelStreamService $labelStreamService
     ) {}
@@ -27,28 +30,44 @@ class PageSubscriber implements EventSubscriberInterface
 
     public function onProductPageLoaded(ProductPageLoadedEvent $event): void
     {
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
+        $product = $event->getPage()->getProduct();
+
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts([$product->getId()], $event->getContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
-
-        $product = $event->getPage()->getProduct();
+        
         $this->labelStreamService->applyLabelsToProduct($product, $productLabelsStreamProducts);
     }
 
     public function onProductListingEvent(ProductListingResultEvent $event): void
     {
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
+        $entities = $event->getResult()->getEntities();
+
+        if ($entities->count() === 0) {
+            return;
+        }
+
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
 
-        $this->applyLabelsToProducts($event->getResult()->getEntities(), $productLabelsStreamProducts);
+        $this->applyLabelsToProducts($entities, $productLabelsStreamProducts);
     }
 
     public function onProductCrossSellingsLoaded(ProductCrossSellingsLoadedEvent $event): void
     {
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($event->getContext());
+        $entityIds = [];
+        foreach ($event->getCrossSellings() as $crossSell) {
+            $entityIds = array_merge($entityIds, $crossSell->getProducts()->getIds());
+        }
+
+        if (!$entityIds) {
+            return;
+        }
+
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entityIds, $event->getContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
@@ -58,9 +77,9 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function fetchLabelStreamProducts($context): array
+    private function fetchLabelStreamProducts($productIds, $context): array
     {
-        return $this->labelStreamService->getProductLabelStreamProducts($context);
+        return $this->labelStreamService->getProductLabelStreamProducts($productIds, $context);
     }
 
     private function applyLabelsToProducts($productEntities, array $productLabelsStreamProducts): void

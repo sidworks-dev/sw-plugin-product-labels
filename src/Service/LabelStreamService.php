@@ -21,7 +21,7 @@ class LabelStreamService
         private readonly EntityRepository $productRepository
     ) {}
 
-    public function getProductLabelStreamProducts(Context $context): array
+    public function getProductLabelStreamProducts($productIds, Context $context): array
     {
         $productLabelsCriteria = new Criteria();
         $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
@@ -42,7 +42,7 @@ class LabelStreamService
                 $context
             );
 
-            $productStreamCriteria = new Criteria();
+            $productStreamCriteria = new Criteria($productIds);
             $productStreamCriteria->addFilter(...$productStreamFilters);
 
             $streamProducts = $this->productRepository->search($productStreamCriteria, $context);
