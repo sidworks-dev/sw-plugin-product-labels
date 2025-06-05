@@ -42,7 +42,6 @@ class ProductSliderCmsElementResolverDecorator extends ProductSliderCmsElementRe
         $this->eventDispatcher->dispatch(
             new ProductSliderProductsLoadedEvent(
                 $products,
-                $slot->getUniqueIdentifier(),
                 $resolverContext->getSalesChannelContext()
             )
         );
