@@ -31,7 +31,7 @@ class Migration1732810410Translations extends MigrationStep
                     REFERENCES `sidworks_product_labels` (`id`) 
                         ON DELETE CASCADE 
                         ON UPDATE CASCADE,
-                CONSTRAINT `fk.properties_translations.language_id` 
+                CONSTRAINT `fk.sidworks_product_labels_properties_translations.language_id` 
                     FOREIGN KEY (`language_id`)
                     REFERENCES `language` (`id`) 
                         ON DELETE CASCADE 
