@@ -32,5 +32,13 @@
             <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
             <tag name="messenger.message_handler"/>
         </service>-->
+
+        <service id="Sidworks\ProductLabels\Decorator\ProductSliderCmsElementResolverDecorator" decorates="Shopware\Core\Content\Product\Cms\ProductSliderCmsElementResolver">
+            <argument type="service" id="Sidworks\ProductLabels\Decorator\ProductSliderCmsElementResolverDecorator.inner" />
+            <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
+            <argument type="service" id="event_dispatcher"/>
+
+            <tag name="shopware.cms.data_resolver" />
+        </service>
     </services>
 </container>

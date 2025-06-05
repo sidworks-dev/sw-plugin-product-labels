@@ -6,14 +6,12 @@ use Shopware\Core\Content\Product\Events\ProductCrossSellingsLoadedEvent;
 use Shopware\Core\Content\Product\Events\ProductListingResultEvent;
 use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
+use Sidworks\ProductLabels\Event\ProductSliderProductsLoadedEvent;
 use Sidworks\ProductLabels\Service\LabelStreamService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
 {
-
-    public $hasSet = false;
-
     public function __construct(
         private readonly LabelStreamService $labelStreamService
     ) {}
@@ -21,11 +19,28 @@ class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            ProductSliderProductsLoadedEvent::class => "onProductSliderLoaded",
             ProductPageLoadedEvent::class => 'onProductPageLoaded',
             ProductListingResultEvent::class => 'onProductListingEvent',
             ProductCrossSellingsLoadedEvent::class => 'onProductCrossSellingsLoaded',
             ProductSearchResultEvent::class => 'onProductListingEvent',
         ];
+    }
+
+    public function onProductSliderLoaded(ProductSliderProductsLoadedEvent $event): void
+    {
+        $entities = $event->getProducts();
+
+        if ($entities->count() === 0) {
+            return;
+        }
+
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getContext());
+        if (empty($productLabelsStreamProducts)) {
+            return;
+        }
+
+        $this->applyLabelsToProducts($entities, $productLabelsStreamProducts);
     }
 
     public function onProductPageLoaded(ProductPageLoadedEvent $event): void
@@ -36,7 +51,7 @@ class PageSubscriber implements EventSubscriberInterface
         if (empty($productLabelsStreamProducts)) {
             return;
         }
-        
+
         $this->labelStreamService->applyLabelsToProduct($product, $productLabelsStreamProducts);
     }
 
