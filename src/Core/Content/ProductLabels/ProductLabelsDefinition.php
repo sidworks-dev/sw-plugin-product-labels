@@ -2,15 +2,18 @@
 
 namespace Sidworks\ProductLabels\Core\Content\ProductLabels;
 
+use Shopware\Core\Content\Product\ProductDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\BoolField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\DateTimeField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\ApiAware;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\CascadeDelete;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\JsonField;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\ManyToManyAssociationField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\StringField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslatedField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\TranslationsAssociationField;
@@ -46,7 +49,10 @@ class ProductLabelsDefinition extends EntityDefinition
                 (new StringField('background_color', 'backgroundColor'))->addFlags(new ApiAware(), new Required()),
                 (new StringField('text_color', 'textColor'))->addFlags(new ApiAware(), new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new ApiAware(), new Required()),
-                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new ApiAware(), new Required()),
+                (new JsonField('selected_products', 'selectedProducts'))->addFlags(new ApiAware()),
+
+                (new FkField('product_stream_id', 'productStreamId', ProductStreamDefinition::class))->addFlags(new ApiAware()),
+
                 (new BoolField('from_to_active', 'fromToActive')),
                 (new DateTimeField('from_date_time', 'fromDateTime')),
                 (new DateTimeField('to_date_time', 'toDateTime')),

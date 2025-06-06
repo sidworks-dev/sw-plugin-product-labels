@@ -2,6 +2,7 @@ import template from './sidworks-product-labels-detail.html.twig';
 
 const { Mixin } = Shopware;
 const { mapPropertyErrors } = Shopware.Component.getComponentHelper();
+const { Criteria } = Shopware.Data;
 
 export default {
     template,
@@ -41,7 +42,10 @@ export default {
             isLoading: false,
             processSuccess: false,
             label: null,
-            labelRepository: null
+            labelRepository: null,
+            salesChannelRepository: null,
+            productRepository: null,
+            selectedProductIds: []
         };
     },
 
@@ -73,10 +77,33 @@ export default {
             'productStreamId',
             'backgroundColor',
             'textColor'
-        ])
+        ]),
+
+        productCriteria() {
+            const criteria = new Criteria(1, 25);
+            return criteria;
+        },
     },
 
     methods: {
+        getLabel() {
+            const criteria = new Criteria();
+
+            if (this.labelId || this.label?.id) {
+                this.labelRepository
+                    .get(this.labelId || this.label?.id, Shopware.Context.api, criteria)
+                    .then((label) => {
+                        this.label = label;
+
+                        if (!Array.isArray(this.label.selectedProducts)) {
+                            this.label.selectedProducts = [];
+                        }
+                    });
+            } else {
+                this.label = this.labelRepository.create(Shopware.Context.api);
+            }
+        },
+
         onSave() {
             this.isLoading = true;
 
@@ -94,31 +121,20 @@ export default {
                     this.getLabel();
                     this.isLoading = false;
                     this.processSuccess = true;
-                }).catch((exception) => {
+                }).catch(() => {
                     this.isLoading = false;
                     this.showErrorNotification();
                 });
         },
 
         onCancel() {
-            this.$router.push({name: 'sidworks.product.labels.index'});
+            this.$router.push({ name: 'sidworks.product.labels.index' });
         },
 
         saveFinish() {
             this.processSuccess = false;
         },
 
-        getLabel() {
-            if (this.labelId || this.label?.id) {
-                this.labelRepository
-                    .get(this.labelId || this.label?.id, Shopware.Context.api)
-                    .then((label) => {
-                        this.label = label;
-                    });
-            } else {
-                this.label = this.labelRepository.create(Shopware.Context.api);
-            }
-        },
         onChangeLanguage(languageId) {
             Shopware.State.commit('context/setApiLanguageId', languageId);
             this.getLabel();
@@ -138,12 +154,13 @@ export default {
             this.createNotificationError({
                 message: this.$tc('global.notification.notificationSaveErrorMessageRequiredFieldsInvalid'),
             });
-        },
+        }
     },
 
     created() {
         this.labelRepository = this.repositoryFactory.create('sidworks_product_labels');
         this.salesChannelRepository = this.repositoryFactory.create('sales_channel');
+        this.productRepository = this.repositoryFactory.create('product');
 
         this.getLabel();
     }

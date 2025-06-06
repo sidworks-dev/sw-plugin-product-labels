@@ -63,7 +63,7 @@ export default {
                     inlineEdit: 'boolean',
                     allowResize: true,
                     align: 'center',
-                }, {
+                }/*, {
                     property: 'fromToActive',
                     label: "Scheduler",
                     inlineEdit: 'boolean',
@@ -83,7 +83,7 @@ export default {
                     inlineEdit: 'date',
                     allowResize: true,
                     align: 'center',
-                }
+                }*/
             ];
         }
     },

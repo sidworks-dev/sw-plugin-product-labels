@@ -15,43 +15,44 @@ class LabelStreamService
 {
     private const SIDWORKS_PRODUCT_LABELS_EXTENSION = 'sidworksProductLabels';
 
+    private array $labelCache = [];
+
     public function __construct(
         private readonly EntityRepository $productLabelsRepository,
         private readonly ProductStreamBuilderInterface $productStreamBuilder,
         private readonly EntityRepository $productRepository
     ) {}
 
-    public function getProductLabelStreamProducts($productIds, Context $context): array
+    public function getProductLabelStreamProducts(array $productIds, Context $context): array
     {
-        $productLabelsCriteria = new Criteria();
-        $productLabelsCriteria->addFilter(new EqualsFilter('active', 1));
-        $productLabelsCriteria->addFilter(new ContainsFilter('salesChannelIds', $context->getSource()->getSalesChannelId()));
+        $cacheKey = md5(implode(',', $productIds) . $context->getSource()->getSalesChannelId());
 
-        $productLabels = $this->productLabelsRepository
-            ->search($productLabelsCriteria, $context)
-            ->getEntities();
+        if (isset($this->labelCache[$cacheKey])) {
+            return $this->labelCache[$cacheKey];
+        }
+
+        $productLabels = $this->fetchActiveProductLabels($context);
 
         $productLabelStreamItems = [];
+
         foreach ($productLabels as $productLabel) {
             if (!$this->shouldShowProductLabel($productLabel)) {
                 continue;
             }
 
-            $productStreamFilters = $this->productStreamBuilder->buildFilters(
-                $productLabel->getProductStreamId(),
-                $context
-            );
+            $matchedIds = $this->getMatchedProductIds($productLabel, $productIds, $context);
 
-            $productStreamCriteria = new Criteria($productIds);
-            $productStreamCriteria->addFilter(...$productStreamFilters);
-
-            $streamProducts = $this->productRepository->search($productStreamCriteria, $context);
+            if (empty($matchedIds)) {
+                continue;
+            }
 
             $productLabelStreamItems[] = [
-                'stream' => $streamProducts,
                 'label' => $productLabel,
+                'matchedProductIds' => array_values(array_unique($matchedIds)),
             ];
         }
+
+        $this->labelCache[$cacheKey] = $productLabelStreamItems;
 
         return $productLabelStreamItems;
     }
@@ -59,11 +60,12 @@ class LabelStreamService
     public function applyLabelsToProduct($product, array $productLabelsStreamProducts): void
     {
         foreach ($productLabelsStreamProducts as $productLabelsStreamProduct) {
-            $streamProducts = $productLabelsStreamProduct['stream']->getIds();
+            $matchedIds = $productLabelsStreamProduct['matchedProductIds'] ?? [];
             $label = $productLabelsStreamProduct['label'];
             $labelId = $label->getId();
 
-            if (!in_array($product->getId(), $streamProducts, true)) {
+            $matchedMap = array_flip($matchedIds);
+            if (!isset($matchedMap[$product->getId()])) {
                 continue;
             }
 
@@ -75,6 +77,46 @@ class LabelStreamService
         }
     }
 
+
+    private function fetchActiveProductLabels(Context $context): iterable
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', 1));
+        $criteria->addFilter(new ContainsFilter('salesChannelIds', $context->getSource()->getSalesChannelId()));
+
+        return $this->productLabelsRepository->search($criteria, $context)->getEntities();
+    }
+
+    private function getMatchedProductIds(ProductLabelsEntity $productLabel, array $productIds, Context $context): array
+    {
+        $matchedIds = [];
+
+        $selectedProducts = $productLabel->getSelectedProducts() ?? [];
+        $selectedMatches = array_intersect($productIds, $selectedProducts);
+        if (!empty($selectedMatches)) {
+            $matchedIds += array_flip($selectedMatches);
+        }
+
+        if ($productLabel->getProductStreamId()) {
+            $productStreamFilters = $this->productStreamBuilder->buildFilters(
+                $productLabel->getProductStreamId(),
+                $context
+            );
+
+            $criteria = new Criteria($productIds);
+            $criteria->addFilter(...$productStreamFilters);
+
+            $streamProducts = $this->productRepository->search($criteria, $context);
+            $streamProductIds = $streamProducts->getIds();
+
+            foreach ($streamProductIds as $id) {
+                $matchedIds[$id] = true;
+            }
+        }
+
+        return array_keys($matchedIds);
+    }
+
     public function shouldShowProductLabel(ProductLabelsEntity $productLabel): bool
     {
         if (!$productLabel->getFromToActive()) {
@@ -82,13 +124,13 @@ class LabelStreamService
         }
 
         $now = new \DateTimeImmutable();
-        $fromDateTime = $productLabel->getFromDateTime();
-        $toDateTime = $productLabel->getToDateTime();
+        $from = $productLabel->getFromDateTime();
+        $to = $productLabel->getToDateTime();
 
         return match (true) {
-            $fromDateTime && $fromDateTime > $now => false,
-            $toDateTime && $toDateTime < $now => false,
-            $fromDateTime && $fromDateTime <= $now && (!$toDateTime || $toDateTime >= $now) => true,
+            $from && $from > $now => false,
+            $to && $to < $now => false,
+            $from && $from <= $now && (!$to || $to >= $now) => true,
             default => $productLabel->getActive()
         };
     }

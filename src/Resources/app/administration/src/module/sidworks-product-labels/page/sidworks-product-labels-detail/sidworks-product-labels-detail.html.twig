@@ -36,25 +36,24 @@
                         <sw-card
                             v-if="label"
                             :is-loading="isLoading"
-                            title="General settings"
+                            :title="$tc('sidworks-product-labels.detail.generalSettings')"
                         >
                             <sw-switch-field
-                                label="Enabled"
+                                :label="$tc('sidworks-product-labels.detail.enabled')"
                                 v-model:value="label.active"
                                 :style="{ marginTop: '0' }"
                             />
 
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-text-field
-                                    label="Label internal name"
+                                    :label="$tc('sidworks-product-labels.detail.labelInternalName')"
                                     v-model:value="label.name"
                                     :error="labelNameError"
                                     required
-                                >
-                                </sw-text-field>
+                                />
 
                                 <sw-entity-multi-id-select
-                                    label="Sales Channels"
+                                    :label="$tc('sidworks-product-labels.detail.salesChannels')"
                                     :repository="salesChannelRepository"
                                     v-model:value="label.salesChannelIds"
                                     :error="labelSalesChannelIdsError"
@@ -63,38 +62,57 @@
                             </sw-container>
 
                             <sw-text-field
-                                label="Label content"
+                                :label="$tc('sidworks-product-labels.detail.labelContent')"
                                 v-model:value="label.content"
                                 :error="labelContentError"
                                 required
                             />
 
                             <sw-entity-single-select
-                                label="Dynamic Product Group"
+                                :label="$tc('sidworks-product-labels.detail.dynamicProductGroup')"
                                 entity="product_stream"
                                 v-model:value="label.productStreamId"
                                 @update:value="onChange"
                                 :error="labelProductStreamIdError"
-                                required
                                 show-clearable-button
                             />
+
+                            <sw-entity-multi-id-select
+                                v-model:value="label.selectedProducts"
+                                :label="$tc('sidworks-product-labels.detail.products')"
+                                :repository="productRepository"
+                                :criteria="productCriteria"
+                                @update:value="onChange"
+                            >
+                                <template #selection-label-property="{ item }">
+                                    <slot name="selection-label-property" v-bind="{ item }">
+                                        {{ item.translated.name || item.name }} ({{ item.productNumber }})
+                                    </slot>
+                                </template>
+
+                                <template #result-label-property="{ item, index }">
+                                    <slot name="result-label-property" v-bind="{ item, index }">
+                                        {{ item.translated.name || item.name }} ({{ item.productNumber }})
+                                    </slot>
+                                </template>
+                            </sw-entity-multi-id-select>
                         </sw-card>
 
                         <sw-card
                             v-if="label"
                             :is-loading="isLoading"
-                            title="Styling"
+                            :title="$tc('sidworks-product-labels.detail.styling')"
                         >
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-colorpicker
-                                    label="Background color"
+                                    :label="$tc('sidworks-product-labels.detail.backgroundColor')"
                                     v-model:value="label.backgroundColor"
                                     :error="labelBackgroundColorError"
                                     required
                                 />
 
                                 <sw-colorpicker
-                                    label="Text color"
+                                    :label="$tc('sidworks-product-labels.detail.textColor')"
                                     v-model:value="label.textColor"
                                     :error="labelTextColorError"
                                     required
@@ -102,33 +120,33 @@
                             </sw-container>
                         </sw-card>
 
-                        <sw-card
-                                v-if="label"
-                                :is-loading="isLoading"
-                                title="Scheduling"
+                        {#<sw-card
+                            v-if="label"
+                            :is-loading="isLoading"
+                            :title="$tc('sidworks-product-labels.detail.scheduling')"
                         >
                             <sw-checkbox-field
-                                    label="Schedule enabled"
-                                    v-model:value="label.fromToActive"
+                                :label="$tc('sidworks-product-labels.detail.scheduleEnabled')"
+                                v-model:value="label.fromToActive"
                             />
 
                             <sw-container columns="1fr 1fr" gap="16px">
                                 <sw-datepicker
-                                        :disabled="!label.fromToActive"
-                                        label="Active From Date"
-                                        v-model:value="label.fromDateTime"
-                                        date-type="datetime"
-                                        :placeholder="'Select a start date, this can be left empty'"
+                                    :disabled="!label.fromToActive"
+                                    :label="$tc('sidworks-product-labels.detail.activeFromDate')"
+                                    v-model:value="label.fromDateTime"
+                                    date-type="datetime"
+                                    :placeholder="$tc('sidworks-product-labels.detail.activeFromDatePlaceholder')"
                                 />
                                 <sw-datepicker
-                                        :disabled="!label.fromToActive"
-                                        label="Active To Date"
-                                        v-model:value="label.toDateTime"
-                                        date-type="datetime"
-                                        :placeholder="'Select an end date, this can be left empty'"
+                                    :disabled="!label.fromToActive"
+                                    :label="$tc('sidworks-product-labels.detail.activeToDate')"
+                                    v-model:value="label.toDateTime"
+                                    date-type="datetime"
+                                    :placeholder="$tc('sidworks-product-labels.detail.activeToDatePlaceholder')"
                                 />
                             </sw-container>
-                        </sw-card>
+                        </sw-card>#}
                     </template>
                 </sw-card-view>
             </template>

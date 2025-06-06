@@ -2,6 +2,7 @@
 
 namespace Sidworks\ProductLabels\Core\Content\ProductLabels;
 
+use Shopware\Core\Content\Product\ProductCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 
 class ProductLabelsEntity extends Entity
@@ -54,5 +55,15 @@ class ProductLabelsEntity extends Entity
     public function getTextColor(): ?string
     {
         return $this->textColor;
+    }
+
+    public function getSelectedProducts()
+    {
+        return $this->selectedProducts;
+    }
+
+    public function setSelectedProducts(): ?array
+    {
+        return $this->selectedProducts;
     }
 }

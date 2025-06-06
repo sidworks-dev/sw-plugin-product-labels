@@ -17,7 +17,23 @@
             "addButtonText": "Add label"
         },
         "detail": {
-            "name": "Name"
+            "name": "Name",
+            "enabled": "Enabled",
+            "labelInternalName": "Label Internal Name",
+            "salesChannels": "Sales Channels",
+            "labelContent": "Label Content",
+            "dynamicProductGroup": "Dynamic Product Group",
+            "products": "Products",
+            "generalSettings": "General settings",
+            "styling": "Styling",
+            "backgroundColor": "Background Color",
+            "textColor": "Text Color",
+            "scheduling": "Scheduling",
+            "scheduleEnabled": "Schedule enabled",
+            "activeFromDate": "Active From Date",
+            "activeToDate": "Active To Date",
+            "activeFromDatePlaceholder": "Select a start date, this can be left empty",
+            "activeToDatePlaceholder": "Select an end date, this can be left empty"
         }
     }
 }
