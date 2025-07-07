@@ -9,6 +9,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Struct\ArrayEntity;
+use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepository;
+use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsEntity;
 
 class LabelStreamService
@@ -20,18 +22,18 @@ class LabelStreamService
     public function __construct(
         private readonly EntityRepository $productLabelsRepository,
         private readonly ProductStreamBuilderInterface $productStreamBuilder,
-        private readonly EntityRepository $productRepository
+        private readonly SalesChannelRepository $productRepository
     ) {}
 
-    public function getProductLabelStreamProducts(array $productIds, Context $context): array
+    public function getProductLabelStreamProducts(array $productIds, SalesChannelContext $context): array
     {
-        $cacheKey = md5(implode(',', $productIds) . $context->getSource()->getSalesChannelId());
+        $cacheKey = md5(implode(',', $productIds) . $context->getSalesChannelId());
 
         if (isset($this->labelCache[$cacheKey])) {
             return $this->labelCache[$cacheKey];
         }
 
-        $productLabels = $this->fetchActiveProductLabels($context);
+        $productLabels = $this->fetchActiveProductLabels($context->getContext());
 
         $productLabelStreamItems = [];
 
@@ -77,7 +79,6 @@ class LabelStreamService
         }
     }
 
-
     private function fetchActiveProductLabels(Context $context): iterable
     {
         $criteria = new Criteria();
@@ -87,7 +88,7 @@ class LabelStreamService
         return $this->productLabelsRepository->search($criteria, $context)->getEntities();
     }
 
-    private function getMatchedProductIds(ProductLabelsEntity $productLabel, array $productIds, Context $context): array
+    private function getMatchedProductIds(ProductLabelsEntity $productLabel, array $productIds, SalesChannelContext $context): array
     {
         $matchedIds = [];
 
@@ -98,16 +99,16 @@ class LabelStreamService
         }
 
         if ($productLabel->getProductStreamId()) {
-            $productStreamFilters = $this->productStreamBuilder->buildFilters(
+            $filters = $this->productStreamBuilder->buildFilters(
                 $productLabel->getProductStreamId(),
-                $context
+                $context->getContext()
             );
 
             $criteria = new Criteria($productIds);
-            $criteria->addFilter(...$productStreamFilters);
+            $criteria->addFilter(...$filters);
 
             $streamProducts = $this->productRepository->search($criteria, $context);
-            $streamProductIds = $streamProducts->getIds();
+            $streamProductIds = $streamProducts->getEntities()->getIds();
 
             foreach ($streamProductIds as $id) {
                 $matchedIds[$id] = true;

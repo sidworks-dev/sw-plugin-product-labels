@@ -14,7 +14,7 @@
         <service id="Sidworks\ProductLabels\Service\LabelStreamService">
             <argument type="service" id="sidworks_product_labels.repository"/>
             <argument type="service" id="Shopware\Core\Content\ProductStream\Service\ProductStreamBuilder"/>
-            <argument type="service" id="product.repository"/>
+            <argument type="service" id="sales_channel.product.repository" />
         </service>
 
         <service id="Sidworks\ProductLabels\Storefront\Page\Product\Subscriber\PageSubscriber">

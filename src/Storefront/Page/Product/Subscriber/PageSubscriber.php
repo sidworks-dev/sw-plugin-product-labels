@@ -35,7 +35,7 @@ class PageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getContext());
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getSalesChannelContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
@@ -47,7 +47,7 @@ class PageSubscriber implements EventSubscriberInterface
     {
         $product = $event->getPage()->getProduct();
 
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts([$product->getId()], $event->getContext());
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts([$product->getId()], $event->getSalesChannelContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
@@ -63,7 +63,7 @@ class PageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getContext());
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entities->getIds(), $event->getSalesChannelContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
@@ -82,7 +82,7 @@ class PageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entityIds, $event->getContext());
+        $productLabelsStreamProducts = $this->fetchLabelStreamProducts($entityIds, $event->getSalesChannelContext());
         if (empty($productLabelsStreamProducts)) {
             return;
         }
