@@ -1,7 +1,7 @@
 # Change Log for Sidworks Product Labels plugin
 All notable changes to this module will be documented in this file.
 
-## 1.0.1 [07-07-2025]
+## 1.0.1 [08-07-2025]
 ### Fixed
 - Make sure to use SalesChannelContext for products
 

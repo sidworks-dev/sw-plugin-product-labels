@@ -7,14 +7,11 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
-use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
+use Shopware\Core\Framework\Struct\ArrayEntity;
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsEntity;
 
 class LabelStreamService
@@ -22,6 +19,8 @@ class LabelStreamService
     private const SIDWORKS_PRODUCT_LABELS_EXTENSION = 'sidworksProductLabels';
 
     private array $labelCache = [];
+    private array $variantMappingCache = [];
+    private array $streamMatchCache = [];
 
     public function __construct(
         private readonly EntityRepository $productLabelsRepository,
@@ -31,151 +30,210 @@ class LabelStreamService
 
     public function getProductLabelStreamProducts(array $productIds, SalesChannelContext $context): array
     {
-        $cacheKey = md5(implode(',', $productIds) . $context->getSalesChannelId());
-
+        $cacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId());
         if (isset($this->labelCache[$cacheKey])) {
             return $this->labelCache[$cacheKey];
         }
 
         $productLabels = $this->fetchActiveProductLabels($context->getContext());
-
         $productLabelStreamItems = [];
+
+        if (!$productLabels) {
+            return [];
+        }
+
+        // Pre-fetch variant mapping once for all labels
+        $variantToParent = $this->getVariantToParentMapping($productIds, $context);
 
         foreach ($productLabels as $productLabel) {
             if (!$this->shouldShowProductLabel($productLabel)) {
                 continue;
             }
 
-            $matchedIds = $this->getMatchedProductIds($productLabel, $productIds, $context);
-
+            $matchedIds = $this->getMatchedProductIds($productLabel, $productIds, $context, $variantToParent);
             if (empty($matchedIds)) {
                 continue;
             }
 
             $productLabelStreamItems[] = [
                 'label' => $productLabel,
-                'matchedProductIds' => array_values(array_unique($matchedIds)),
+                'matchedProductIds' => $matchedIds,
             ];
         }
 
         $this->labelCache[$cacheKey] = $productLabelStreamItems;
-
         return $productLabelStreamItems;
     }
 
     public function applyLabelsToProduct($product, array $productLabelsStreamProducts): void
     {
-        foreach ($productLabelsStreamProducts as $productLabelsStreamProduct) {
-            $matchedIds = $productLabelsStreamProduct['matchedProductIds'] ?? [];
-            $label = $productLabelsStreamProduct['label'];
-            $labelId = $label->getId();
+        $productId = $product->getId();
+        $sidworksProductLabels = $product->getExtension(self::SIDWORKS_PRODUCT_LABELS_EXTENSION) ?? new ArrayEntity();
 
-            $matchedMap = array_flip($matchedIds);
-            if (!isset($matchedMap[$product->getId()])) {
+        foreach ($productLabelsStreamProducts as $productLabelsStreamProduct) {
+            if (!in_array($productId, $productLabelsStreamProduct['matchedProductIds'], true)) {
                 continue;
             }
 
-            /** @var ArrayEntity $sidworksProductLabels */
-            $sidworksProductLabels = $product->getExtension(self::SIDWORKS_PRODUCT_LABELS_EXTENSION) ?? new ArrayEntity();
-            $sidworksProductLabels->set($labelId, $label);
+            $label = $productLabelsStreamProduct['label'];
+            $sidworksProductLabels->set($label->getId(), $label);
+        }
 
+        if ($sidworksProductLabels->all()) {
             $product->addExtension(self::SIDWORKS_PRODUCT_LABELS_EXTENSION, $sidworksProductLabels);
         }
     }
 
     private function fetchActiveProductLabels(Context $context): iterable
     {
+        $salesChannelId = $context->getSource()->getSalesChannelId();
+        $cacheKey = "active_labels_{$salesChannelId}";
+
+        if (isset($this->labelCache[$cacheKey])) {
+            return $this->labelCache[$cacheKey];
+        }
+
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('active', 1));
-        $criteria->addFilter(new ContainsFilter('salesChannelIds', $context->getSource()->getSalesChannelId()));
+        $criteria->addFilter(new ContainsFilter('salesChannelIds', $salesChannelId));
 
-        return $this->productLabelsRepository->search($criteria, $context)->getEntities();
+        $result = $this->productLabelsRepository->search($criteria, $context)->getEntities();
+        $this->labelCache[$cacheKey] = $result;
+
+        return $result;
     }
 
-    private function getMatchedProductIds(ProductLabelsEntity $productLabel, array $productIds, SalesChannelContext $context): array
-    {
+    private function getMatchedProductIds(
+        ProductLabelsEntity $productLabel,
+        array $productIds,
+        SalesChannelContext $context,
+        array $variantToParent
+    ): array {
         $matchedIds = [];
 
-        $selectedProducts = $productLabel->getSelectedProducts() ?? [];
-        $selectedMatches = array_intersect($productIds, $selectedProducts);
-        if (!empty($selectedMatches)) {
-            $matchedIds = array_flip($selectedMatches);
+        // Handle selected products
+        if ($selectedProducts = $productLabel->getSelectedProducts()) {
+            $matchedIds = array_flip(array_intersect($productIds, $selectedProducts));
         }
 
-        $filters = null;
-        if ($productLabel->getProductStreamId()) {
-            $filters = $this->productStreamBuilder->buildFilters(
-                $productLabel->getProductStreamId(),
-                $context->getContext()
-            );
-
-            $productIds[] = '18e3f68e6de24264b6e837098d16ac1c';
-            $criteria = new Criteria($productIds);
-            $criteria->addFilter(...$filters);
-            $criteria->addFields(['id']);
-
-            $streamProducts = $this->productRepository->search($criteria, $context);
-            $streamProductIds = $streamProducts->getEntities()->getIds();
-
-            foreach ($streamProductIds as $id) {
-                $matchedIds[$id] = true;
-            }
+        // Handle product stream
+        if ($streamId = $productLabel->getProductStreamId()) {
+            $streamMatches = $this->matchProductsByStream($streamId, $productIds, $context);
+            $matchedIds = array_merge($matchedIds, $streamMatches);
         }
 
+        // Handle variants
         if ($this->shouldProcessVariants($selectedProducts, $productLabel->getProductStreamId())) {
-            $variantToParent = $this->getVariantToParentMapping($productIds, $context);
-
-            if (!empty($variantToParent)) {
-                if (!empty($selectedProducts)) {
-                    $variantMatches = array_intersect(array_keys($variantToParent), $selectedProducts);
-                    foreach ($variantMatches as $variantId) {
-                        $matchedIds[$variantToParent[$variantId]] = true;
-                    }
-                }
-
-                if ($filters !== null) {
-                    $variantIds = array_keys($variantToParent);
-                    $variantStreamCriteria = new Criteria($variantIds);
-                    $variantStreamCriteria->addFilter(...$filters);
-                    $variantStreamCriteria->addFields(['id']);
-
-                    $variantStreamProducts = $this->productRepository->search($variantStreamCriteria, $context);
-
-                    foreach ($variantStreamProducts->getIds() as $variantId) {
-                        $matchedIds[$variantToParent[$variantId]] = true;
-                    }
-                }
-            }
+            $variantMatches = $this->processVariantMatches($selectedProducts, $streamId, $variantToParent, $context);
+            $matchedIds = array_merge($matchedIds, $variantMatches);
         }
 
         return array_keys($matchedIds);
     }
 
-    private function shouldProcessVariants(array $selectedProducts, ?string $productStreamId): bool
+    private function processVariantMatches(
+        ?array $selectedProducts,
+        ?string $streamId,
+        array $variantToParent,
+        SalesChannelContext $context
+    ): array {
+        $matchedIds = [];
+
+        if (!empty($selectedProducts)) {
+            foreach (array_intersect(array_keys($variantToParent), $selectedProducts) as $variantId) {
+                $matchedIds[$variantToParent[$variantId]] = true;
+            }
+        }
+
+        if ($streamId && !empty($variantToParent)) {
+            $streamVariantMatches = $this->matchVariantsByStream($streamId, array_keys($variantToParent), $variantToParent, $context);
+            $matchedIds = array_merge($matchedIds, $streamVariantMatches);
+        }
+
+        return $matchedIds;
+    }
+
+    private function matchProductsByStream(string $streamId, array $productIds, SalesChannelContext $context): array
+    {
+        $cacheKey = $this->getStreamCacheKey($streamId, $productIds, $context->getSalesChannelId());
+
+        if (isset($this->streamMatchCache[$cacheKey])) {
+            return $this->streamMatchCache[$cacheKey];
+        }
+
+        $filters = $this->productStreamBuilder->buildFilters($streamId, $context->getContext());
+        $criteria = new Criteria($this->ensureMinProductIds($productIds));
+        $criteria->addFilter(...$filters)->addFields(['id']);
+
+        $matchedIds = [];
+        foreach ($this->productRepository->search($criteria, $context)->getIds() as $id) {
+            $matchedIds[$id] = true;
+        }
+
+        $this->streamMatchCache[$cacheKey] = $matchedIds;
+        return $matchedIds;
+    }
+
+    private function matchVariantsByStream(string $streamId, array $variantIds, array $variantToParent, SalesChannelContext $context): array
+    {
+        $cacheKey = $this->getStreamCacheKey($streamId, $variantIds, $context->getSalesChannelId()) . '_variants';
+
+        if (isset($this->streamMatchCache[$cacheKey])) {
+            return $this->streamMatchCache[$cacheKey];
+        }
+
+        $filters = $this->productStreamBuilder->buildFilters($streamId, $context->getContext());
+        $criteria = new Criteria($variantIds);
+        $criteria->addFilter(...$filters)->addFields(['id']);
+
+        $matchedIds = [];
+        foreach ($this->productRepository->search($criteria, $context)->getIds() as $variantId) {
+            if (isset($variantToParent[$variantId])) {
+                $matchedIds[$variantToParent[$variantId]] = true;
+            }
+        }
+
+        $this->streamMatchCache[$cacheKey] = $matchedIds;
+        return $matchedIds;
+    }
+
+    private function shouldProcessVariants(?array $selectedProducts, ?string $productStreamId): bool
     {
         return !empty($selectedProducts) || $productStreamId !== null;
     }
 
     private function getVariantToParentMapping(array $productIds, SalesChannelContext $context): array
     {
-        $variantCriteria = new Criteria();
-        $variantCriteria->addFilter(new EqualsAnyFilter('parentId', $productIds));
-        $variantCriteria->addFields(['id', 'parentId']);
-
-        $variantProducts = $this->productRepository->search($variantCriteria, $context);
-
-        if ($variantProducts->count() === 0) {
+        if (empty($productIds)) {
             return [];
         }
 
-        $variantToParent = [];
-        foreach ($variantProducts->getEntities() as $variant) {
-            $variantId = $variant->get('id');
-            $parentId = $variant->get('parentId');
-            $variantToParent[$variantId] = $parentId;
+        $cacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId()) . '_variants';
+
+        if (isset($this->variantMappingCache[$cacheKey])) {
+            return $this->variantMappingCache[$cacheKey];
         }
 
-        return $variantToParent;
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsAnyFilter('parentId', $productIds));
+        $criteria->addFields(['id', 'parentId']);
+
+        $variantProducts = $this->productRepository->search($criteria, $context);
+
+        $mapping = [];
+        foreach ($variantProducts->getEntities() as $variant) {
+            $mapping[$variant->get('id')] = $variant->get('parentId');
+        }
+
+        $this->variantMappingCache[$cacheKey] = $mapping;
+        return $mapping;
+    }
+
+    private function ensureMinProductIds(array $productIds): array
+    {
+        return count($productIds) === 1
+            ? array_merge($productIds, ['00000000000000000000000000000000'])
+            : $productIds;
     }
 
     public function shouldShowProductLabel(ProductLabelsEntity $productLabel): bool
@@ -191,8 +249,19 @@ class LabelStreamService
         return match (true) {
             $from && $from > $now => false,
             $to && $to < $now => false,
-            $from && $from <= $now && (!$to || $to >= $now) => true,
-            default => $productLabel->getActive()
+            default => true,
         };
+    }
+
+    private function getCacheKey(array $productIds, string $salesChannelId): string
+    {
+        sort($productIds); // Ensure consistent ordering for cache keys
+        return md5(implode(',', $productIds) . $salesChannelId);
+    }
+
+    private function getStreamCacheKey(string $streamId, array $productIds, string $salesChannelId): string
+    {
+        sort($productIds);
+        return md5($streamId . implode(',', $productIds) . $salesChannelId);
     }
 }
