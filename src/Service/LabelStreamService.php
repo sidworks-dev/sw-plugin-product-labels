@@ -8,9 +8,13 @@ use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Grouping\FieldGrouping;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsEntity;
 
 class LabelStreamService
@@ -95,17 +99,20 @@ class LabelStreamService
         $selectedProducts = $productLabel->getSelectedProducts() ?? [];
         $selectedMatches = array_intersect($productIds, $selectedProducts);
         if (!empty($selectedMatches)) {
-            $matchedIds += array_flip($selectedMatches);
+            $matchedIds = array_flip($selectedMatches);
         }
 
+        $filters = null;
         if ($productLabel->getProductStreamId()) {
             $filters = $this->productStreamBuilder->buildFilters(
                 $productLabel->getProductStreamId(),
                 $context->getContext()
             );
 
+            $productIds[] = '18e3f68e6de24264b6e837098d16ac1c';
             $criteria = new Criteria($productIds);
             $criteria->addFilter(...$filters);
+            $criteria->addFields(['id']);
 
             $streamProducts = $this->productRepository->search($criteria, $context);
             $streamProductIds = $streamProducts->getEntities()->getIds();
@@ -115,7 +122,60 @@ class LabelStreamService
             }
         }
 
+        if ($this->shouldProcessVariants($selectedProducts, $productLabel->getProductStreamId())) {
+            $variantToParent = $this->getVariantToParentMapping($productIds, $context);
+
+            if (!empty($variantToParent)) {
+                if (!empty($selectedProducts)) {
+                    $variantMatches = array_intersect(array_keys($variantToParent), $selectedProducts);
+                    foreach ($variantMatches as $variantId) {
+                        $matchedIds[$variantToParent[$variantId]] = true;
+                    }
+                }
+
+                if ($filters !== null) {
+                    $variantIds = array_keys($variantToParent);
+                    $variantStreamCriteria = new Criteria($variantIds);
+                    $variantStreamCriteria->addFilter(...$filters);
+                    $variantStreamCriteria->addFields(['id']);
+
+                    $variantStreamProducts = $this->productRepository->search($variantStreamCriteria, $context);
+
+                    foreach ($variantStreamProducts->getIds() as $variantId) {
+                        $matchedIds[$variantToParent[$variantId]] = true;
+                    }
+                }
+            }
+        }
+
         return array_keys($matchedIds);
+    }
+
+    private function shouldProcessVariants(array $selectedProducts, ?string $productStreamId): bool
+    {
+        return !empty($selectedProducts) || $productStreamId !== null;
+    }
+
+    private function getVariantToParentMapping(array $productIds, SalesChannelContext $context): array
+    {
+        $variantCriteria = new Criteria();
+        $variantCriteria->addFilter(new EqualsAnyFilter('parentId', $productIds));
+        $variantCriteria->addFields(['id', 'parentId']);
+
+        $variantProducts = $this->productRepository->search($variantCriteria, $context);
+
+        if ($variantProducts->count() === 0) {
+            return [];
+        }
+
+        $variantToParent = [];
+        foreach ($variantProducts->getEntities() as $variant) {
+            $variantId = $variant->get('id');
+            $parentId = $variant->get('parentId');
+            $variantToParent[$variantId] = $parentId;
+        }
+
+        return $variantToParent;
     }
 
     public function shouldShowProductLabel(ProductLabelsEntity $productLabel): bool
