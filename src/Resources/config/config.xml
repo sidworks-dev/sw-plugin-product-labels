@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>General Settings</title>
+        <title lang="de-DE">Allgemeine Einstellungen</title>
+        
+        <input-field type="bool">
+            <name>enabled</name>
+            <label>Enable Product Labels</label>
+            <label lang="de-DE">Produktlabels aktivieren</label>
+            <helpText>Enable or disable product labels globally across all sales channels</helpText>
+            <helpText lang="de-DE">Produktlabels global f?r alle Verkaufskan?le aktivieren oder deaktivieren</helpText>
+            <defaultValue>true</defaultValue>
+        </input-field>
+
+        <input-field type="int">
+            <name>cacheTtl</name>
+            <label>Cache TTL (seconds)</label>
+            <label lang="de-DE">Cache TTL (Sekunden)</label>
+            <helpText>How long to cache product label data (default: 3600 = 1 hour)</helpText>
+            <helpText lang="de-DE">Wie lange Produktlabel-Daten gecacht werden sollen (Standard: 3600 = 1 Stunde)</helpText>
+            <defaultValue>3600</defaultValue>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Performance Settings</title>
+        <title lang="de-DE">Performance-Einstellungen</title>
+
+        <input-field type="bool">
+            <name>enableRequestCache</name>
+            <label>Enable Request-scoped Cache</label>
+            <label lang="de-DE">Request-Cache aktivieren</label>
+            <helpText>Enable in-memory caching for the duration of a single request</helpText>
+            <helpText lang="de-DE">In-Memory-Caching f?r die Dauer einer einzelnen Anfrage aktivieren</helpText>
+            <defaultValue>true</defaultValue>
+        </input-field>
+
+        <input-field type="bool">
+            <name>enablePersistentCache</name>
+            <label>Enable Persistent Cache</label>
+            <label lang="de-DE">Persistenten Cache aktivieren</label>
+            <helpText>Enable persistent caching using Redis/HTTP cache</helpText>
+            <helpText lang="de-DE">Persistentes Caching mit Redis/HTTP-Cache aktivieren</helpText>
+            <defaultValue>true</defaultValue>
+        </input-field>
+    </card>
+</config>

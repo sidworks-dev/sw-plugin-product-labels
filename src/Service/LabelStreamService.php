@@ -3,6 +3,7 @@
 namespace Sidworks\ProductLabels\Service;
 
 use Shopware\Core\Content\ProductStream\Service\ProductStreamBuilderInterface;
+use Shopware\Core\Framework\Adapter\Cache\CacheValueCompressor;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -13,10 +14,14 @@ use Shopware\Core\System\SalesChannel\Entity\SalesChannelRepository;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\Framework\Struct\ArrayEntity;
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsEntity;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class LabelStreamService
 {
     private const SIDWORKS_PRODUCT_LABELS_EXTENSION = 'sidworksProductLabels';
+    private const CACHE_TTL = 3600; // 1 hour
+    private const CACHE_TAG_PREFIX = 'sidworks-product-labels';
 
     private array $labelCache = [];
     private array $variantMappingCache = [];
@@ -25,16 +30,39 @@ class LabelStreamService
     public function __construct(
         private readonly EntityRepository $productLabelsRepository,
         private readonly ProductStreamBuilderInterface $productStreamBuilder,
-        private readonly SalesChannelRepository $productRepository
+        private readonly SalesChannelRepository $productRepository,
+        private readonly CacheInterface $cache
     ) {}
 
     public function getProductLabelStreamProducts(array $productIds, SalesChannelContext $context): array
     {
-        $cacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId());
-        if (isset($this->labelCache[$cacheKey])) {
-            return $this->labelCache[$cacheKey];
+        // Check request-scoped cache first
+        $requestCacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId());
+        if (isset($this->labelCache[$requestCacheKey])) {
+            return $this->labelCache[$requestCacheKey];
         }
 
+        // Check persistent cache
+        $persistentCacheKey = $this->getPersistentCacheKey($productIds, $context->getSalesChannelId());
+
+        $result = $this->cache->get($persistentCacheKey, function (ItemInterface $item) use ($productIds, $context) {
+            $item->expiresAfter(self::CACHE_TTL);
+            $item->tag([
+                self::CACHE_TAG_PREFIX,
+                self::CACHE_TAG_PREFIX . '-sales-channel-' . $context->getSalesChannelId()
+            ]);
+
+            return $this->computeProductLabelStreamProducts($productIds, $context);
+        });
+
+        // Store in request-scoped cache for subsequent calls in same request
+        $this->labelCache[$requestCacheKey] = $result;
+
+        return $result;
+    }
+
+    private function computeProductLabelStreamProducts(array $productIds, SalesChannelContext $context): array
+    {
         $productLabels = $this->fetchActiveProductLabels($context->getContext());
         $productLabelStreamItems = [];
 
@@ -61,7 +89,6 @@ class LabelStreamService
             ];
         }
 
-        $this->labelCache[$cacheKey] = $productLabelStreamItems;
         return $productLabelStreamItems;
     }
 
@@ -93,11 +120,26 @@ class LabelStreamService
             return $this->labelCache[$cacheKey];
         }
 
-        $criteria = new Criteria();
-        $criteria->addFilter(new EqualsFilter('active', 1));
-        $criteria->addFilter(new ContainsFilter('salesChannelIds', $salesChannelId));
+        // Use persistent cache for active labels
+        $persistentCacheKey = self::CACHE_TAG_PREFIX . '-active-labels-' . $salesChannelId;
 
-        $result = $this->productLabelsRepository->search($criteria, $context)->getEntities();
+        $result = $this->cache->get($persistentCacheKey, function (ItemInterface $item) use ($salesChannelId, $context) {
+            $item->expiresAfter(self::CACHE_TTL);
+            $item->tag([
+                self::CACHE_TAG_PREFIX,
+                self::CACHE_TAG_PREFIX . '-sales-channel-' . $salesChannelId
+            ]);
+
+            $criteria = new Criteria();
+            $criteria->addFilter(new EqualsFilter('active', 1));
+            $criteria->addFilter(new ContainsFilter('salesChannelIds', $salesChannelId));
+
+            // Note: Not using addFields() here as it returns PartialEntity which causes type issues
+            // The caching provides much better performance gains than field selection
+
+            return $this->productLabelsRepository->search($criteria, $context)->getEntities();
+        });
+
         $this->labelCache[$cacheKey] = $result;
 
         return $result;
@@ -259,9 +301,34 @@ class LabelStreamService
         return md5(implode(',', $productIds) . $salesChannelId);
     }
 
+    private function getPersistentCacheKey(array $productIds, string $salesChannelId): string
+    {
+        sort($productIds);
+        return self::CACHE_TAG_PREFIX . '-products-' . md5(implode(',', $productIds) . $salesChannelId);
+    }
+
     private function getStreamCacheKey(string $streamId, array $productIds, string $salesChannelId): string
     {
         sort($productIds);
         return md5($streamId . implode(',', $productIds) . $salesChannelId);
+    }
+
+    /**
+     * Invalidate all product label caches
+     */
+    public function invalidateCache(?string $salesChannelId = null): void
+    {
+        if ($salesChannelId) {
+            $this->cache->invalidateTags([
+                self::CACHE_TAG_PREFIX . '-sales-channel-' . $salesChannelId
+            ]);
+        } else {
+            $this->cache->invalidateTags([self::CACHE_TAG_PREFIX]);
+        }
+
+        // Clear request-scoped caches
+        $this->labelCache = [];
+        $this->variantMappingCache = [];
+        $this->streamMatchCache = [];
     }
 }

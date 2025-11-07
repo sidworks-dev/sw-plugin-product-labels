@@ -15,11 +15,18 @@
             <argument type="service" id="sidworks_product_labels.repository"/>
             <argument type="service" id="Shopware\Core\Content\ProductStream\Service\ProductStreamBuilder"/>
             <argument type="service" id="sales_channel.product.repository" />
+            <argument type="service" id="cache.object" />
         </service>
 
         <service id="Sidworks\ProductLabels\Storefront\Page\Product\Subscriber\PageSubscriber">
             <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
             <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Sidworks\ProductLabels\Command\ClearLabelCacheCommand">
+            <argument type="service" id="Sidworks\ProductLabels\Service\LabelStreamService"/>
+            <tag name="console.command"/>
         </service>
 
         <!--<service id="Sidworks\ProductLabels\ScheduledTask\LabelsTask">

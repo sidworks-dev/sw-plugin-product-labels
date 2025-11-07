@@ -5,6 +5,7 @@ namespace Sidworks\ProductLabels\Storefront\Page\Product\Subscriber;
 use Shopware\Core\Content\Product\Events\ProductCrossSellingsLoadedEvent;
 use Shopware\Core\Content\Product\Events\ProductListingResultEvent;
 use Shopware\Core\Content\Product\Events\ProductSearchResultEvent;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Sidworks\ProductLabels\Event\ProductSliderProductsLoadedEvent;
 use Sidworks\ProductLabels\Service\LabelStreamService;
@@ -13,7 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LabelStreamService $labelStreamService
+        private readonly LabelStreamService $labelStreamService,
+        private readonly SystemConfigService $systemConfigService
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -29,6 +31,11 @@ class PageSubscriber implements EventSubscriberInterface
 
     public function onProductSliderLoaded(ProductSliderProductsLoadedEvent $event): void
     {
+        // OPTIMIZATION: Check if labels are enabled before processing
+        if (!$this->isLabelPluginEnabled($event->getSalesChannelContext()->getSalesChannelId())) {
+            return;
+        }
+
         $entities = $event->getProducts();
 
         if ($entities->count() === 0) {
@@ -45,6 +52,11 @@ class PageSubscriber implements EventSubscriberInterface
 
     public function onProductPageLoaded(ProductPageLoadedEvent $event): void
     {
+        // OPTIMIZATION: Check if labels are enabled before processing
+        if (!$this->isLabelPluginEnabled($event->getSalesChannelContext()->getSalesChannelId())) {
+            return;
+        }
+
         $product = $event->getPage()->getProduct();
 
         $productLabelsStreamProducts = $this->fetchLabelStreamProducts([$product->getId()], $event->getSalesChannelContext());
@@ -57,6 +69,11 @@ class PageSubscriber implements EventSubscriberInterface
 
     public function onProductListingEvent(ProductListingResultEvent $event): void
     {
+        // OPTIMIZATION: Check if labels are enabled before processing
+        if (!$this->isLabelPluginEnabled($event->getSalesChannelContext()->getSalesChannelId())) {
+            return;
+        }
+
         $entities = $event->getResult()->getEntities();
 
         if ($entities->count() === 0) {
@@ -73,6 +90,11 @@ class PageSubscriber implements EventSubscriberInterface
 
     public function onProductCrossSellingsLoaded(ProductCrossSellingsLoadedEvent $event): void
     {
+        // OPTIMIZATION: Check if labels are enabled before processing
+        if (!$this->isLabelPluginEnabled($event->getSalesChannelContext()->getSalesChannelId())) {
+            return;
+        }
+
         $entityIds = [];
         foreach ($event->getCrossSellings() as $crossSell) {
             $entityIds = array_merge($entityIds, $crossSell->getProducts()->getIds());
@@ -106,5 +128,13 @@ class PageSubscriber implements EventSubscriberInterface
         foreach ($productEntities as $productEntity) {
             $this->labelStreamService->applyLabelsToProduct($productEntity, $productLabelsStreamProducts);
         }
+    }
+
+    private function isLabelPluginEnabled(?string $salesChannelId = null): bool
+    {
+        return (bool) $this->systemConfigService->get(
+            'SidworksProductLabels.config.enabled',
+            $salesChannelId
+        );
     }
 }
