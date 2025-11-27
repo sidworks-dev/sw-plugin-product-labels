@@ -15,9 +15,9 @@
 
         {% block sidworks_product_labels_list_smart_bar_actions %}
             <template #smart-bar-actions>
-                <sw-button variant="primary" :router-link="{ name: 'sidworks.product.labels.create' }">
+                <mt-button variant="primary" size="default" @click="onAddLabelClick">
                     {{ $tc('sidworks-product-labels.list.addButtonText') }}
-                </sw-button>
+                </mt-button>
             </template>
         {% endblock %}
 

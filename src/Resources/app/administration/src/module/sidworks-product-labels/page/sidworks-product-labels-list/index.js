@@ -25,6 +25,9 @@ export default {
     },
 
     methods: {
+        onAddLabelClick() {
+            this.$router.push({ name: 'sidworks.product.labels.create' });
+        },
         getList() {
             this.labelRepository
                 .search(new Criteria(), Shopware.Context.api)
@@ -63,27 +66,7 @@ export default {
                     inlineEdit: 'boolean',
                     allowResize: true,
                     align: 'center',
-                }/*, {
-                    property: 'fromToActive',
-                    label: "Scheduler",
-                    inlineEdit: 'boolean',
-                    allowResize: true,
-                    align: 'center',
-                },
-                {
-                    property: 'fromDateTime',
-                    label: "From",
-                    inlineEdit: 'date',
-                    allowResize: true,
-                    align: 'center',
-                },
-                {
-                    property: 'toDateTime',
-                    label: "To",
-                    inlineEdit: 'date',
-                    allowResize: true,
-                    align: 'center',
-                }*/
+                }
             ];
         }
     },

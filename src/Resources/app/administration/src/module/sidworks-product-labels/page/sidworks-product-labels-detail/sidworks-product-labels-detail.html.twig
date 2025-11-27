@@ -9,18 +9,20 @@
         </template>
 
         <template #smart-bar-actions>
-            <sw-button
+            <mt-button
+                size="default"
                 v-tooltip.bottom="tooltipCancel"
                 :disabled="isLoading"
                 @click="onCancel"
             >
                 {{ $tc('global.default.cancel') }}
-            </sw-button>
+            </mt-button>
 
             <sw-button-process
+                size="default"
                 v-tooltip.bottom="tooltipSave"
-                :isLoading="isLoading"
-                :processSuccess="processSuccess"
+                :is-loading="isLoading"
+                :process-success="processSuccess"
                 variant="primary"
                 @click.prevent="onSave"
                 @update:process-success="saveFinish"
@@ -32,122 +34,88 @@
         {% block sidworks_product_labels_detail_content %}
             <template #content>
                 <sw-card-view>
-                    <template>
-                        <sw-card
-                            v-if="label"
-                            :is-loading="isLoading"
-                            :title="$tc('sidworks-product-labels.detail.generalSettings')"
-                        >
-                            <sw-switch-field
-                                :label="$tc('sidworks-product-labels.detail.enabled')"
-                                v-model:value="label.active"
-                                :style="{ marginTop: '0' }"
-                            />
+                    <mt-card
+                        v-if="label"
+                        :is-loading="isLoading"
+                        :title="$tc('sidworks-product-labels.detail.generalSettings')"
+                    >
+                        <sw-switch-field
+                            :label="$tc('sidworks-product-labels.detail.enabled')"
+                            v-model:value="label.active"
+                            :style="{ marginTop: '0' }"
+                        />
 
-                            <sw-container columns="1fr 1fr" gap="16px">
-                                <sw-text-field
-                                    :label="$tc('sidworks-product-labels.detail.labelInternalName')"
-                                    v-model:value="label.name"
-                                    :error="labelNameError"
-                                    required
-                                />
-
-                                <sw-entity-multi-id-select
-                                    :label="$tc('sidworks-product-labels.detail.salesChannels')"
-                                    :repository="salesChannelRepository"
-                                    v-model:value="label.salesChannelIds"
-                                    :error="labelSalesChannelIdsError"
-                                    required
-                                />
-                            </sw-container>
-
-                            <sw-text-field
-                                :label="$tc('sidworks-product-labels.detail.labelContent')"
-                                v-model:value="label.content"
-                                :error="labelContentError"
+                        <sw-container columns="1fr 1fr" gap="16px">
+                            <mt-text-field
+                                :label="$tc('sidworks-product-labels.detail.labelInternalName')"
+                                v-model="label.name"
+                                :error="labelNameError"
                                 required
                             />
 
-                            <sw-entity-single-select
-                                :label="$tc('sidworks-product-labels.detail.dynamicProductGroup')"
-                                entity="product_stream"
-                                v-model:value="label.productStreamId"
-                                @update:value="onChange"
-                                :error="labelProductStreamIdError"
-                                show-clearable-button
-                            />
-
                             <sw-entity-multi-id-select
-                                v-model:value="label.selectedProducts"
-                                :label="$tc('sidworks-product-labels.detail.products')"
-                                :repository="productRepository"
-                                :criteria="productCriteria"
-                                @update:value="onChange"
-                            >
-                                <template #selection-label-property="{ item }">
-                                    <slot name="selection-label-property" v-bind="{ item }">
-                                        {{ item.translated.name || item.name }} ({{ item.productNumber }})
-                                    </slot>
-                                </template>
+                                :label="$tc('sidworks-product-labels.detail.salesChannels')"
+                                :repository="salesChannelRepository"
+                                v-model:value="label.salesChannelIds"
+                                :error="labelSalesChannelIdsError"
+                                required
+                            />
+                        </sw-container>
 
-                                <template #result-label-property="{ item, index }">
-                                    <slot name="result-label-property" v-bind="{ item, index }">
-                                        {{ item.translated.name || item.name }} ({{ item.productNumber }})
-                                    </slot>
-                                </template>
-                            </sw-entity-multi-id-select>
-                        </sw-card>
+                        <mt-text-field
+                            :label="$tc('sidworks-product-labels.detail.labelContent')"
+                            v-model="label.content"
+                            :error="labelContentError"
+                            required
+                        />
 
-                        <sw-card
-                            v-if="label"
-                            :is-loading="isLoading"
-                            :title="$tc('sidworks-product-labels.detail.styling')"
+                        <sw-entity-single-select
+                            :label="$tc('sidworks-product-labels.detail.dynamicProductGroup')"
+                            entity="product_stream"
+                            v-model:value="label.productStreamId"
+                            @update:model-value="onChange"
+                            :error="labelProductStreamIdError"
+                            show-clearable-button
+                        />
+
+                        <sw-entity-multi-id-select
+                            v-model:value="label.selectedProducts"
+                            :label="$tc('sidworks-product-labels.detail.products')"
+                            :repository="productRepository"
+                            :criteria="productCriteria"
+                            @update:model-value="onChange"
                         >
-                            <sw-container columns="1fr 1fr" gap="16px">
-                                <sw-colorpicker
-                                    :label="$tc('sidworks-product-labels.detail.backgroundColor')"
-                                    v-model:value="label.backgroundColor"
-                                    :error="labelBackgroundColorError"
-                                    required
-                                />
+                            <template #selection-label-property="{ item }">
+                                {{ item.translated.name || item.name }} ({{ item.productNumber }})
+                            </template>
 
-                                <sw-colorpicker
-                                    :label="$tc('sidworks-product-labels.detail.textColor')"
-                                    v-model:value="label.textColor"
-                                    :error="labelTextColorError"
-                                    required
-                                />
-                            </sw-container>
-                        </sw-card>
+                            <template #result-label-property="{ item }">
+                                {{ item.translated.name || item.name }} ({{ item.productNumber }})
+                            </template>
+                        </sw-entity-multi-id-select>
+                    </mt-card>
 
-                        {#<sw-card
-                            v-if="label"
-                            :is-loading="isLoading"
-                            :title="$tc('sidworks-product-labels.detail.scheduling')"
-                        >
-                            <sw-checkbox-field
-                                :label="$tc('sidworks-product-labels.detail.scheduleEnabled')"
-                                v-model:value="label.fromToActive"
+                    <mt-card
+                        v-if="label"
+                        :is-loading="isLoading"
+                        :title="$tc('sidworks-product-labels.detail.styling')"
+                    >
+                        <sw-container columns="1fr 1fr" gap="16px">
+                            <mt-colorpicker
+                                :label="$tc('sidworks-product-labels.detail.backgroundColor')"
+                                v-model="label.backgroundColor"
+                                :error="labelBackgroundColorError"
+                                required
                             />
 
-                            <sw-container columns="1fr 1fr" gap="16px">
-                                <sw-datepicker
-                                    :disabled="!label.fromToActive"
-                                    :label="$tc('sidworks-product-labels.detail.activeFromDate')"
-                                    v-model:value="label.fromDateTime"
-                                    date-type="datetime"
-                                    :placeholder="$tc('sidworks-product-labels.detail.activeFromDatePlaceholder')"
-                                />
-                                <sw-datepicker
-                                    :disabled="!label.fromToActive"
-                                    :label="$tc('sidworks-product-labels.detail.activeToDate')"
-                                    v-model:value="label.toDateTime"
-                                    date-type="datetime"
-                                    :placeholder="$tc('sidworks-product-labels.detail.activeToDatePlaceholder')"
-                                />
-                            </sw-container>
-                        </sw-card>#}
-                    </template>
+                            <mt-colorpicker
+                                :label="$tc('sidworks-product-labels.detail.textColor')"
+                                v-model="label.textColor"
+                                :error="labelTextColorError"
+                                required
+                            />
+                        </sw-container>
+                    </mt-card>
                 </sw-card-view>
             </template>
         {% endblock %}

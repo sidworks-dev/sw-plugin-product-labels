@@ -2,9 +2,9 @@
     "name": "sidworks/sw-plugin-product-labels",
     "description": "Sidworks product labels",
     "type": "shopware-platform-plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "require": {
-        "shopware/core": "~6.6.0 || ~6.7.0"
+        "shopware/core": "~6.7.0"
     },
     "license": "MIT",
     "authors": [
