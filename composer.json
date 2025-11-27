@@ -4,7 +4,7 @@
     "type": "shopware-platform-plugin",
     "version": "1.0.2",
     "require": {
-        "shopware/core": "^6.6"
+        "shopware/core": "~6.6.0 || ~6.7.0"
     },
     "license": "MIT",
     "authors": [
