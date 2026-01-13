@@ -36,14 +36,16 @@ class LabelStreamService
 
     public function getProductLabelStreamProducts(array $productIds, SalesChannelContext $context): array
     {
+        $languageId = $context->getLanguageId();
+
         // Check request-scoped cache first
-        $requestCacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId());
+        $requestCacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId(), $languageId);
         if (isset($this->labelCache[$requestCacheKey])) {
             return $this->labelCache[$requestCacheKey];
         }
 
         // Check persistent cache
-        $persistentCacheKey = $this->getPersistentCacheKey($productIds, $context->getSalesChannelId());
+        $persistentCacheKey = $this->getPersistentCacheKey($productIds, $context->getSalesChannelId(), $languageId);
 
         $result = $this->cache->get($persistentCacheKey, function (ItemInterface $item) use ($productIds, $context) {
             $item->expiresAfter(self::CACHE_TTL);
@@ -114,14 +116,15 @@ class LabelStreamService
     private function fetchActiveProductLabels(Context $context): iterable
     {
         $salesChannelId = $context->getSource()->getSalesChannelId();
-        $cacheKey = "active_labels_{$salesChannelId}";
+        $languageId = $context->getLanguageId();
+        $cacheKey = "active_labels_{$salesChannelId}_{$languageId}";
 
         if (isset($this->labelCache[$cacheKey])) {
             return $this->labelCache[$cacheKey];
         }
 
         // Use persistent cache for active labels
-        $persistentCacheKey = self::CACHE_TAG_PREFIX . '-active-labels-' . $salesChannelId;
+        $persistentCacheKey = self::CACHE_TAG_PREFIX . '-active-labels-' . $salesChannelId . '-' . $languageId;
 
         $result = $this->cache->get($persistentCacheKey, function (ItemInterface $item) use ($salesChannelId, $context) {
             $item->expiresAfter(self::CACHE_TTL);
@@ -197,7 +200,7 @@ class LabelStreamService
 
     private function matchProductsByStream(string $streamId, array $productIds, SalesChannelContext $context): array
     {
-        $cacheKey = $this->getStreamCacheKey($streamId, $productIds, $context->getSalesChannelId());
+        $cacheKey = $this->getStreamCacheKey($streamId, $productIds, $context->getSalesChannelId(), $context->getLanguageId());
 
         if (isset($this->streamMatchCache[$cacheKey])) {
             return $this->streamMatchCache[$cacheKey];
@@ -218,7 +221,7 @@ class LabelStreamService
 
     private function matchVariantsByStream(string $streamId, array $variantIds, array $variantToParent, SalesChannelContext $context): array
     {
-        $cacheKey = $this->getStreamCacheKey($streamId, $variantIds, $context->getSalesChannelId()) . '_variants';
+        $cacheKey = $this->getStreamCacheKey($streamId, $variantIds, $context->getSalesChannelId(), $context->getLanguageId()) . '_variants';
 
         if (isset($this->streamMatchCache[$cacheKey])) {
             return $this->streamMatchCache[$cacheKey];
@@ -250,7 +253,7 @@ class LabelStreamService
             return [];
         }
 
-        $cacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId()) . '_variants';
+        $cacheKey = $this->getCacheKey($productIds, $context->getSalesChannelId(), $context->getLanguageId()) . '_variants';
 
         if (isset($this->variantMappingCache[$cacheKey])) {
             return $this->variantMappingCache[$cacheKey];
@@ -295,22 +298,22 @@ class LabelStreamService
         };
     }
 
-    private function getCacheKey(array $productIds, string $salesChannelId): string
+    private function getCacheKey(array $productIds, string $salesChannelId, string $languageId): string
     {
         sort($productIds); // Ensure consistent ordering for cache keys
-        return md5(implode(',', $productIds) . $salesChannelId);
+        return md5(implode(',', $productIds) . $salesChannelId . $languageId);
     }
 
-    private function getPersistentCacheKey(array $productIds, string $salesChannelId): string
+    private function getPersistentCacheKey(array $productIds, string $salesChannelId, string $languageId): string
     {
         sort($productIds);
-        return self::CACHE_TAG_PREFIX . '-products-' . md5(implode(',', $productIds) . $salesChannelId);
+        return self::CACHE_TAG_PREFIX . '-products-' . md5(implode(',', $productIds) . $salesChannelId . $languageId);
     }
 
-    private function getStreamCacheKey(string $streamId, array $productIds, string $salesChannelId): string
+    private function getStreamCacheKey(string $streamId, array $productIds, string $salesChannelId, string $languageId): string
     {
         sort($productIds);
-        return md5($streamId . implode(',', $productIds) . $salesChannelId);
+        return md5($streamId . implode(',', $productIds) . $salesChannelId . $languageId);
     }
 
     /**
