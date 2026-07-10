@@ -4,12 +4,32 @@
     {% if sidworksProductLabels and sidworksProductLabels.all|length > 0 %}
         {% block component_sidworks_product_badges_elements %}
             {% for sidworksProductLabel in sidworksProductLabels.all %}
+                {% set labelLink = (sidworksProductLabel.translated.link ?? '')|trim %}
+                {% set linkNewTab = sidworksProductLabel.translated.linkNewTab ?? false %}
+                {% set labelLinkIsAllowed = labelLink
+                    and (
+                        labelLink starts with 'https://'
+                        or labelLink starts with 'http://'
+                        or (labelLink starts with '/' and not (labelLink starts with '//'))
+                    )
+                %}
+
                 <div data-sidworks-product-label-id="{{ sidworksProductLabel.id }}">
-                    <span class="badge badge-sidworks-product-labels-label"
-                          style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
-                    >
-                        {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
-                    </span>
+                    {% if labelLinkIsAllowed %}
+                        <a class="badge badge-sidworks-product-labels-label"
+                           href="{{ labelLink|escape('html_attr') }}"
+                           {% if linkNewTab %}target="_blank" rel="noopener noreferrer"{% endif %}
+                           style="text-decoration: none;{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
+                        >
+                            {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
+                        </a>
+                    {% else %}
+                        <span class="badge badge-sidworks-product-labels-label"
+                              style="{% if sidworksProductLabel.backgroundColor %}background-color: {{ sidworksProductLabel.backgroundColor|escape|sw_sanitize }};{% endif %}{% if sidworksProductLabel.textColor %} color: {{ sidworksProductLabel.textColor|escape|sw_sanitize }};{% endif %}"
+                        >
+                            {{ sidworksProductLabel.translated.content|escape|sw_sanitize }}
+                        </span>
+                    {% endif %}
                 </div>
             {% endfor %}
         {% endblock %}

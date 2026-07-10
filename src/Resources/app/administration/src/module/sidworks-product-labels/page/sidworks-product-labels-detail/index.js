@@ -74,6 +74,8 @@ export default {
             'name',
             'salesChannelIds',
             'content',
+            'link',
+            'linkNewTab',
             'productStreamId',
             'backgroundColor',
             'textColor'
@@ -98,9 +100,14 @@ export default {
                         if (!Array.isArray(this.label.selectedProducts)) {
                             this.label.selectedProducts = [];
                         }
+
+                        if (this.label.linkNewTab === null || this.label.linkNewTab === undefined) {
+                            this.label.linkNewTab = false;
+                        }
                     });
             } else {
                 this.label = this.labelRepository.create(Shopware.Context.api);
+                this.label.linkNewTab = false;
             }
         },
 

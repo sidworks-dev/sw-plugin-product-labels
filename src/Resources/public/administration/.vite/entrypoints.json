@@ -1,0 +1,26 @@
+{
+  "base": "/bundles/sidworksproductlabels/administration/",
+  "entryPoints": {
+    "sidworks-product-labels": {
+      "css": [],
+      "dynamic": [
+        "/bundles/sidworksproductlabels/administration/assets/index-BDlzzQz8.js",
+        "/bundles/sidworksproductlabels/administration/assets/index-B0ZlB0Fd.js"
+      ],
+      "js": [
+        "/bundles/sidworksproductlabels/administration/assets/sidworks-product-labels-UzK-oxVZ.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "version": [
+    "7.1.0",
+    7,
+    1,
+    0
+  ],
+  "viteServer": null
+}

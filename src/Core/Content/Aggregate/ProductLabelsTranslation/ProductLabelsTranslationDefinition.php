@@ -4,9 +4,11 @@ namespace Sidworks\ProductLabels\Core\Content\Aggregate\ProductLabelsTranslation
 
 use Sidworks\ProductLabels\Core\Content\ProductLabels\ProductLabelsDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\{EntityTranslationDefinition,
+    Field\BoolField,
     Field\Flag\AllowHtml,
     Field\Flag\ApiAware,
     Field\Flag\Required,
+    Field\LongTextField,
     Field\StringField,
     FieldCollection};
 
@@ -38,6 +40,8 @@ class ProductLabelsTranslationDefinition extends EntityTranslationDefinition
         return new FieldCollection([
             (new StringField('name', 'name', 255))->addFlags(new ApiAware(), new Required()),
             (new StringField('content', 'content', 255))->addFlags(new ApiAware(), new Required()),
+            (new LongTextField('link', 'link'))->addFlags(new ApiAware()),
+            (new BoolField('link_new_tab', 'linkNewTab'))->addFlags(new ApiAware()),
         ]);
     }
 

@@ -46,6 +46,8 @@ class ProductLabelsDefinition extends EntityDefinition
                 (new BoolField('active', 'active'))->addFlags(new ApiAware(), new Required()),
                 (new TranslatedField('name'))->addFlags(new ApiAware(), new Required()),
                 (new TranslatedField('content'))->addFlags(new ApiAware(), new Required()),
+                (new TranslatedField('link'))->addFlags(new ApiAware()),
+                (new TranslatedField('linkNewTab'))->addFlags(new ApiAware()),
                 (new StringField('background_color', 'backgroundColor'))->addFlags(new ApiAware(), new Required()),
                 (new StringField('text_color', 'textColor'))->addFlags(new ApiAware(), new Required()),
                 (new JsonField('sales_channels', 'salesChannelIds'))->addFlags(new ApiAware(), new Required()),

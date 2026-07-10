@@ -1,0 +1,24 @@
+{
+  "main.js": {
+    "file": "assets/sidworks-product-labels-UzK-oxVZ.js",
+    "name": "sidworks-product-labels",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "module/sidworks-product-labels/page/sidworks-product-labels-list/index.js",
+      "module/sidworks-product-labels/page/sidworks-product-labels-detail/index.js"
+    ]
+  },
+  "module/sidworks-product-labels/page/sidworks-product-labels-detail/index.js": {
+    "file": "assets/index-B0ZlB0Fd.js",
+    "name": "index",
+    "src": "module/sidworks-product-labels/page/sidworks-product-labels-detail/index.js",
+    "isDynamicEntry": true
+  },
+  "module/sidworks-product-labels/page/sidworks-product-labels-list/index.js": {
+    "file": "assets/index-BDlzzQz8.js",
+    "name": "index",
+    "src": "module/sidworks-product-labels/page/sidworks-product-labels-list/index.js",
+    "isDynamicEntry": true
+  }
+}

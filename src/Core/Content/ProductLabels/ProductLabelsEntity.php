@@ -57,6 +57,16 @@ class ProductLabelsEntity extends Entity
         return $this->textColor;
     }
 
+    public function getLink(): ?string
+    {
+        return $this->translated['link'] ?? null;
+    }
+
+    public function getLinkNewTab(): ?bool
+    {
+        return $this->translated['linkNewTab'] ?? null;
+    }
+
     public function getSelectedProducts()
     {
         return $this->selectedProducts;

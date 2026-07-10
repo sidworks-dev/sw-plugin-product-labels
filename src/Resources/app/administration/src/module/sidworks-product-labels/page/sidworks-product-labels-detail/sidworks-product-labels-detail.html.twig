@@ -69,6 +69,18 @@
                             required
                         />
 
+                        <mt-text-field
+                            :label="$tc('sidworks-product-labels.detail.labelLink')"
+                            :placeholder="$tc('sidworks-product-labels.detail.labelLinkPlaceholder')"
+                            v-model="label.link"
+                            :error="labelLinkError"
+                        />
+
+                        <mt-switch
+                            :label="$tc('sidworks-product-labels.detail.openInNewTab')"
+                            v-model="label.linkNewTab"
+                        />
+
                         <sw-entity-single-select
                             :label="$tc('sidworks-product-labels.detail.dynamicProductGroup')"
                             entity="product_stream"

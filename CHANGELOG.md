@@ -1,6 +1,10 @@
 # Change Log for Sidworks Product Labels plugin
 All notable changes to this module will be documented in this file.
 
+## 1.0.6 [10-07-2026]
+### Added
+- Optional label link field with clickable storefront labels
+
 ## 1.0.5 [13-01-2026]
 ### Fixed
 - Caching for multiple languages on the same store
